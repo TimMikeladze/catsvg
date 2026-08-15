@@ -10,6 +10,9 @@ export const GITHUB_URL = 'https://github.com/TimMikeladze/catsvg';
 export const AUTHOR = 'Tim Mikeladze';
 export const AUTHOR_SITE = 'https://linesofcode.dev';
 
+export const LICENSE = 'MIT';
+export const LICENSE_URL = 'https://opensource.org/licenses/MIT';
+
 export const TITLE = 'CatSVG — cat placeholder images, drawn as SVG';
 export const TAGLINE = 'Cat placeholder images — any size, any seed, pure SVG.';
 
@@ -115,6 +118,10 @@ export const FAQ: Array<{ q: string; a: string }> = [
   {
     q: 'Do I need an API key or an account?',
     a: 'No. The image endpoint is public, sends Access-Control-Allow-Origin: *, and needs no key, token or signup.',
+  },
+  {
+    q: 'Can I use the cats commercially?',
+    a: 'Yes. CatSVG is MIT licensed, and a generated cat is plain SVG with no third-party artwork in it — put it in a client mockup, a product screenshot or a shipped page, no attribution required.',
   },
   {
     q: 'Is this a PlaceKitten alternative?',

@@ -132,6 +132,12 @@ naming it, so inline SVGs are readable to screen readers too.
 and the 1200×630 `public/og.png` social card — all drawn by the same generator
 that serves the API.
 
+## License
+
+[MIT](LICENSE) © 2026 Tim Mikeladze. The cats it draws are plain SVG with no
+third-party artwork in them — use them anywhere, commercially included, no
+attribution required.
+
 ## Credits
 
 Created by [Tim Mikeladze](https://linesofcode.dev) —
