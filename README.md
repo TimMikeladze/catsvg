@@ -1,5 +1,7 @@
 # CatSVG
 
+**[catsvg.vercel.app](https://catsvg.vercel.app)**
+
 A cat-based image placeholder service. Every URL is a cat, rendered as pure SVG
 by a deterministic generator — no image files, no storage, no network calls.
 
@@ -101,6 +103,11 @@ Vercel, no configuration beyond the checked-in `vercel.json`, which rewrites
 ```bash
 vercel deploy
 ```
+
+## Credits
+
+Created by [Tim Mikeladze](https://linesofcode.dev) —
+[linesofcode.dev](https://linesofcode.dev) · [@linesofcode](https://x.com/linesofcode)
 
 ## Origin
 
