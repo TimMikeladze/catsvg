@@ -2,11 +2,11 @@ import { useEffect } from 'react';
 import { ApiDocs } from './ApiDocs';
 import { Controls } from './Controls';
 import { Favourites } from './Favourites';
-import { Footer, GITHUB_URL } from './Footer';
+import { Footer } from './Footer';
+import { Masthead } from './Masthead';
 import { Litter } from './Litter';
 import { Stage } from './Stage';
 import { UrlPanel } from './UrlPanel';
-import { COMBOS } from '../cat/spec';
 import { useCatMachine } from './useCatMachine';
 
 const TYPING = /^(INPUT|SELECT|TEXTAREA)$/;
@@ -29,16 +29,7 @@ export function App() {
 
   return (
     <div className="wrap">
-      <header className="masthead">
-        <h1>CatSVG</h1>
-        <a className="ghlink" href={GITHUB_URL} target="_blank" rel="noreferrer noopener">
-          GitHub
-        </a>
-        <span className="tag">
-          flat geometric cats · pure SVG ·{' '}
-          {COMBOS.toLocaleString('en-US', { notation: 'compact', maximumFractionDigits: 1 })} combinations
-        </span>
-      </header>
+      <Masthead />
 
       <div className="layout">
         <div>

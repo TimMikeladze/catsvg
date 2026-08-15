@@ -50,27 +50,55 @@ body {
 
 header.masthead {
   display: flex;
-  align-items: baseline;
-  gap: 14px;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 24px;
   flex-wrap: wrap;
-  margin-bottom: 18px;
+  margin-bottom: 22px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--ink);
+}
+
+.brand {
+  min-width: 0;
 }
 
 h1 {
   font-family: var(--display);
   font-weight: 800;
-  font-size: clamp(30px, 6vw, 52px);
-  letter-spacing: -0.03em;
+  font-size: clamp(34px, 6vw, 56px);
+  letter-spacing: -0.035em;
   margin: 0;
-  line-height: 0.95;
+  line-height: 0.9;
 }
 
-.tag {
+.lede {
+  margin: 8px 0 0;
+  max-width: 46ch;
+  font-size: 15px;
+  line-height: 1.45;
+  opacity: 0.72;
+}
+
+.masthead-side {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.combos {
   font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.14em;
+  font-size: 11px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  opacity: 0.6;
+  opacity: 0.55;
+  white-space: nowrap;
+}
+
+.combos sup {
+  font-size: 0.75em;
+  letter-spacing: 0;
 }
 
 .layout {
@@ -509,17 +537,41 @@ code.mono {
 }
 
 .ghlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  border: 1.5px solid var(--ink);
+  border: 2px solid var(--ink);
   border-radius: 999px;
-  padding: 4px 11px;
+  padding: 7px 14px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--ink);
   text-decoration: none;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 
 .ghlink:hover {
-  background: var(--ink);
-  color: var(--paper);
+  color: var(--ink);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.ghlink:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 var(--ink);
+}
+
+.ghlink:focus-visible {
+  outline: 3px solid var(--grape);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ghlink {
+    transition: none;
+  }
 }
