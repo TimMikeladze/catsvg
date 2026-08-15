@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { NARROW, useMediaQuery } from './useMediaQuery';
 import { PRESET_NAMES, TRAIT_OPTIONS } from '../cat/spec';
 import { renderCat, renderSheet } from '../cat/render';
 import { makeTraits, newSeed } from '../cat/traits';
@@ -18,6 +19,12 @@ export function Controls({ machine }: ControlsProps) {
   const { traits, locks, preset, width, height } = machine;
   const [seedDraft, setSeedDraft] = useState('');
   const [copyLabel, setCopyLabel] = useState('Copy SVG code');
+
+  // Eighteen dropdowns is a wall on a phone: fold them away there, keep them
+  // open on the desktop column where there is room for them.
+  const narrow = useMediaQuery(NARROW);
+  const [tinkerOpen, setTinkerOpen] = useState(() => !narrow);
+  useEffect(() => setTinkerOpen(!narrow), [narrow]);
 
   const currentSvg = () => renderCat(traits, { width, height });
 
@@ -40,7 +47,7 @@ export function Controls({ machine }: ControlsProps) {
   };
 
   return (
-    <div className="card">
+    <div className="card controls">
       <h2>Make a cat</h2>
       <button type="button" onClick={() => machine.roll()}>
         New cat <span style={{ opacity: 0.5, fontSize: 13 }}>(space)</span>
@@ -108,30 +115,38 @@ export function Controls({ machine }: ControlsProps) {
       </div>
       <p className="hint">Same seed, same cat — every time.</p>
 
-      <h2>Tinker</h2>
-      <div className="tinker">
-        {TRAIT_KEYS.map((key: TraitKey) => (
-          <div key={key}>
-            <label className="f" htmlFor={`s_${key}`}>
-              {key}
-            </label>
-            <select
-              id={`s_${key}`}
-              value={traits[key]}
-              onChange={(e) => machine.setTrait(key, e.target.value)}
-            >
-              {TRAIT_OPTIONS[key].map((v) => (
-                <option key={v} value={v}>
-                  {v}
-                </option>
-              ))}
-            </select>
-          </div>
-        ))}
-      </div>
-      <button type="button" className="ghost sm" style={{ marginTop: 10 }} onClick={machine.clearLocks}>
-        Clear all locks
-      </button>
+      <details
+        className="fold"
+        open={tinkerOpen}
+        onToggle={(e) => setTinkerOpen(e.currentTarget.open)}
+      >
+        <summary>
+          <h2>Tinker</h2>
+        </summary>
+        <div className="tinker">
+          {TRAIT_KEYS.map((key: TraitKey) => (
+            <div key={key}>
+              <label className="f" htmlFor={`s_${key}`}>
+                {key}
+              </label>
+              <select
+                id={`s_${key}`}
+                value={traits[key]}
+                onChange={(e) => machine.setTrait(key, e.target.value)}
+              >
+                {TRAIT_OPTIONS[key].map((v) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
+        </div>
+        <button type="button" className="ghost sm" style={{ marginTop: 10 }} onClick={machine.clearLocks}>
+          Clear all locks
+        </button>
+      </details>
     </div>
   );
 }

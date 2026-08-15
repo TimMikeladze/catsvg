@@ -32,8 +32,10 @@ export function App() {
     <div className="wrap">
       <Masthead />
 
+      {/* On narrow screens the two columns dissolve (`display: contents`) and the
+          cards reorder: cat, controls, URL — see the ordering rules in styles.css. */}
       <div className="layout">
-        <div>
+        <div className="col">
           <Stage
             traits={machine.traits}
             locks={machine.locks}
@@ -45,7 +47,7 @@ export function App() {
           <Faq />
         </div>
 
-        <div>
+        <div className="col">
           <Controls machine={machine} />
           <Favourites
             favourites={machine.favourites}

@@ -125,9 +125,51 @@ h1 {
   align-items: start;
 }
 
+/*
+ * One column on a phone, and the columns themselves get out of the way
+ * (`display: contents`) so every card is a grid item that can be reordered:
+ * the cat first, the controls that change it second, the URL it produces
+ * third. Keep the 900px breakpoint in sync with NARROW in useMediaQuery.ts.
+ */
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .layout > .col {
+    display: contents;
+  }
+
+  .layout .card {
+    order: 4;
+  }
+
+  .layout .card.stage {
+    order: 1;
+  }
+
+  .layout .card.controls {
+    order: 2;
+  }
+
+  .layout .card.urlcard {
+    order: 3;
+  }
+
+  .layout .card.litter {
+    order: 5;
+  }
+
+  .layout .card.favcard {
+    order: 6;
+  }
+
+  .layout .card.docs {
+    order: 7;
+  }
+
+  .layout .card.faqcard {
+    order: 8;
   }
 }
 
@@ -298,6 +340,47 @@ select:focus-visible {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+}
+
+/* A section that folds shut — open on the desktop column, closed on a phone. */
+.fold > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  list-style: none;
+  margin-top: 20px;
+}
+
+.fold > summary::-webkit-details-marker {
+  display: none;
+}
+
+.fold > summary h2 {
+  margin: 0;
+}
+
+.fold > summary::after {
+  content: '+';
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 1;
+  opacity: 0.55;
+}
+
+.fold[open] > summary::after {
+  content: '–';
+}
+
+.fold > summary:focus-visible {
+  outline: 3px solid var(--grape);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.fold[open] > summary {
+  margin-bottom: 12px;
 }
 
 label.f {

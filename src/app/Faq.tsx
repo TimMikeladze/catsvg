@@ -7,7 +7,7 @@ import { FAQ } from '../seo/site';
  */
 export function Faq() {
   return (
-    <div className="card">
+    <div className="card faqcard">
       <h2>Questions</h2>
       <dl className="faq">
         {FAQ.map((item) => (

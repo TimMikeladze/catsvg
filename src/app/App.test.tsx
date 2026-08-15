@@ -88,6 +88,29 @@ describe('App', () => {
     expect(screen.getByText('Not a URL this service understands.')).toBeInTheDocument();
   });
 
+  it('keeps the tinker panel open on a wide screen and folded on a narrow one', () => {
+    const real = window.matchMedia;
+    const fold = () => document.querySelector('.fold') as HTMLDetailsElement;
+
+    render(<App />);
+    expect(fold().open).toBe(true);
+
+    window.matchMedia = ((query: string) => ({
+      matches: query.includes('900px'),
+      media: query,
+      addEventListener() {},
+      removeEventListener() {},
+    })) as unknown as typeof window.matchMedia;
+    try {
+      document.body.innerHTML = '';
+      render(<App />);
+      expect(fold().open).toBe(false);
+      expect(screen.getByText('Tinker')).toBeInTheDocument();
+    } finally {
+      window.matchMedia = real;
+    }
+  });
+
   it('saves and reloads a favourite', async () => {
     const user = userEvent.setup();
     render(<App />);

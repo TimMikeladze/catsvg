@@ -11,7 +11,7 @@ export interface FavouritesProps {
 /** Saved recipes, kept in localStorage. Click loads, shift-click removes. */
 export function Favourites({ favourites, onLoad, onRemove }: FavouritesProps) {
   return (
-    <div className="card">
+    <div className="card favcard">
       <h2>Favourites</h2>
       <div className="favs">
         {favourites.length === 0 ? (

@@ -10,7 +10,7 @@ export interface LitterProps {
 /** Nine alternates under the current locks and preset. */
 export function Litter({ litter, onKeep }: LitterProps) {
   return (
-    <div className="card">
+    <div className="card litter">
       <h2>The litter — tap to keep one</h2>
       <div className="grid3">
         {litter.map((t) => (

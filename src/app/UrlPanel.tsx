@@ -72,7 +72,7 @@ export function UrlPanel({ machine }: UrlPanelProps) {
   }, [pastedUrl]);
 
   return (
-    <div className="card">
+    <div className="card urlcard">
       <h2>Cat URL — drop it in any &lt;img&gt;</h2>
 
       <div className="sizes">
