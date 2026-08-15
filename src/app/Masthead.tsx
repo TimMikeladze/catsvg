@@ -32,9 +32,7 @@ export function Masthead() {
     <header className="masthead">
       <div className="brand">
         <h1>CatSVG</h1>
-        <p className="lede">
-          Cat placeholder images. Any size, any seed — flat geometric cats as pure SVG.
-        </p>
+        <p className="lede">Cat placeholder images — any size, any seed, pure SVG.</p>
       </div>
 
       <div className="masthead-side">
