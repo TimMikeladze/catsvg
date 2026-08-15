@@ -70,17 +70,34 @@ export const noteFor = (seed: string): string => pick(rng(seed + '|note'), NOTES
 export function wrapText(text: string, perLine: number, maxLines: number): string[] {
   const lines: string[] = [];
   let line = '';
-  for (const word of text.split(/\s+/).filter(Boolean)) {
+  const flush = () => {
+    if (line) lines.push(line);
+    line = '';
+  };
+
+  for (const raw of text.split(/\s+/).filter(Boolean)) {
+    let word = raw;
+    // Nothing guarantees a message is made of words. Anything wider than the
+    // panel is broken mid-word rather than let out across the fold.
+    while (word.length > perLine) {
+      flush();
+      if (lines.length >= maxLines) return lines.slice(0, maxLines);
+      lines.push(word.slice(0, perLine));
+      word = word.slice(perLine);
+    }
+    if (!word) continue;
+
     const next = line ? `${line} ${word}` : word;
-    if (next.length <= perLine || !line) {
+    if (next.length <= perLine) {
       line = next;
       continue;
     }
-    lines.push(line);
+    flush();
+    if (lines.length >= maxLines) return lines.slice(0, maxLines);
     line = word;
-    if (lines.length === maxLines) break;
   }
-  if (line && lines.length < maxLines) lines.push(line);
+
+  flush();
   return lines.slice(0, maxLines);
 }
 

@@ -136,8 +136,17 @@ describe('wrapText', () => {
     expect(wrapText('one two three four', 9, 4)).toEqual(['one two', 'three', 'four']);
   });
 
-  it('never drops a word that is longer than the line', () => {
-    expect(wrapText('supercalifragilistic ok', 5, 4)).toEqual(['supercalifragilistic', 'ok']);
+  it('breaks a word that is wider than the line', () => {
+    // Left whole it would run off the panel and across the fold.
+    expect(wrapText('supercalifragilistic ok', 5, 6)).toEqual(['super', 'calif', 'ragil', 'istic', 'ok']);
+    expect(wrapText('hi supercalifragilistic', 5, 6)).toEqual(['hi', 'super', 'calif', 'ragil', 'istic']);
+  });
+
+  it('keeps every line inside the budget, whatever it is given', () => {
+    const typed = "Hi how's it going Sheehan'snejeheejejjejejejejejejejeje";
+    for (const perLine of [8, 12, 29, 40]) {
+      for (const line of wrapText(typed, perLine, 12)) expect(line.length).toBeLessThanOrEqual(perLine);
+    }
   });
 
   it('stops at the line budget instead of running off the card', () => {
