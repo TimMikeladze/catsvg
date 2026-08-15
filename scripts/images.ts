@@ -59,6 +59,13 @@ function card(x: number, y: number, size: number, seed: string, preset: string):
 const SANS = 'Bricolage Grotesque, Helvetica Neue, Helvetica, Arial, sans-serif';
 const MONO = 'IBM Plex Mono, Menlo, monospace';
 
+/**
+ * The URL pill. Monospace at 24px advances 0.6em per character, so the pill can
+ * be sized from the text and stays snug whatever the domain is called.
+ */
+const URL_TEXT = `${SITE_URL.replace('https://', '')}/cat/…`;
+const PILL_W = Math.round(URL_TEXT.length * 24 * 0.6) + 56;
+
 const og = `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_W}" height="${OG_H}" viewBox="0 0 ${OG_W} ${OG_H}">
   <rect width="${OG_W}" height="${OG_H}" fill="${LILAC}"/>
   <text x="72" y="232" font-family="${SANS}" font-weight="800" font-size="104" letter-spacing="-4" fill="${INK}">${SITE_NAME}</text>
@@ -68,8 +75,8 @@ const og = `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_W}" height="${OG
         `<text x="76" y="${292 + i * 40}" font-family="${SANS}" font-size="30" fill="${INK}" opacity=".72">${line}</text>`,
     )
     .join('\n  ')}
-  <rect x="72" y="392" width="500" height="66" rx="33" fill="${PAPER}" stroke="${INK}" stroke-width="4"/>
-  <text x="100" y="435" font-family="${MONO}" font-size="24" fill="${INK}">${SITE_URL.replace('https://', '')}/cat/…</text>
+  <rect x="72" y="392" width="${PILL_W}" height="66" rx="33" fill="${PAPER}" stroke="${INK}" stroke-width="4"/>
+  <text x="100" y="435" font-family="${MONO}" font-size="24" fill="${INK}">${URL_TEXT}</text>
   ${card(650, 60, 240, 'mackerel', 'anything')}
   ${card(910, 60, 240, 'clementine', 'pastel')}
   ${card(780, 330, 240, 'anchovy', 'noir')}
