@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { ApiDocs } from './ApiDocs';
 import { Controls } from './Controls';
+import { Faq } from './Faq';
 import { Favourites } from './Favourites';
 import { Footer } from './Footer';
 import { Masthead } from './Masthead';
@@ -41,6 +42,7 @@ export function App() {
           <UrlPanel machine={machine} />
           <Litter litter={machine.litter} onKeep={machine.keep} />
           <ApiDocs />
+          <Faq />
         </div>
 
         <div>

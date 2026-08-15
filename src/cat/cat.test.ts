@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computeFrame, renderCat, renderSheet } from './render';
+import { computeFrame, describeCat, renderCat, renderSheet } from './render';
 import { catName, makeTraits } from './traits';
 import { SPEC, TRAIT_OPTIONS } from './spec';
 import { TRAIT_KEYS } from './types';
@@ -79,6 +79,16 @@ describe('renderCat', () => {
     expect(svg).toContain('height="240"');
   });
 
+  it('names and describes itself for screen readers and crawlers', () => {
+    const svg = renderCat(traits);
+    const about = describeCat(traits);
+    expect(svg).toContain(`<title id="t`);
+    expect(svg).toContain(about.title);
+    expect(svg).toContain(about.desc);
+    expect(about.title).toBe(`${catName('mackerel')} — a cat placeholder image`);
+    expect(svg).toMatch(/aria-labelledby="t\w+ d\w+"/);
+  });
+
   it('is byte-identical for identical input', () => {
     expect(renderCat(traits, { width: 200 })).toBe(renderCat(makeTraits('mackerel'), { width: 200 }));
   });
@@ -120,5 +130,11 @@ describe('renderSheet', () => {
     const sheet = renderSheet(cats, 2, 400);
     expect(sheet).toContain('viewBox="0 0 800 800"');
     expect(sheet.match(/<g transform="translate\(/g)?.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('announces itself once, not once per cat', () => {
+    const sheet = renderSheet(['a', 'b', 'c', 'd'].map((s) => makeTraits(s)), 2, 400);
+    expect(sheet.match(/<title/g)).toHaveLength(1);
+    expect(sheet).not.toContain('<desc');
   });
 });

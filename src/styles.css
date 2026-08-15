@@ -511,6 +511,159 @@ code.mono {
   overflow-wrap: anywhere;
 }
 
+/* ---------- snippets, FAQ, galleries ---------- */
+
+.snippet-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.snippet-list li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.snippet-label {
+  flex: none;
+  width: 58px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.faq {
+  margin: 0;
+}
+
+.faq dt {
+  font-weight: 600;
+  font-size: 14.5px;
+  margin-top: 14px;
+}
+
+.faq div:first-child dt,
+.faq dt:first-of-type {
+  margin-top: 0;
+}
+
+.faq dd {
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  opacity: 0.75;
+}
+
+.shots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  align-items: start;
+  gap: 16px;
+}
+
+.shot {
+  margin: 0;
+  min-width: 0;
+}
+
+/*
+ * These are placeholder images at their real aspect ratios, so heights vary
+ * wildly. Capping the height keeps the rows even; banners take the whole row
+ * because a 4:1 crop is unreadable in a 200px column.
+ */
+.shot img {
+  display: block;
+  max-width: 100%;
+  max-height: 240px;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.shot.wide {
+  grid-column: 1 / -1;
+}
+
+.shot.wide img {
+  width: 100%;
+  max-height: none;
+}
+
+.shot figcaption {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  line-height: 1.5;
+  opacity: 0.6;
+  margin-top: 6px;
+  overflow-wrap: anywhere;
+}
+
+/*
+ * The prerendered page: what a crawler — or anyone without JavaScript — reads,
+ * and what the gallery page is built from. React replaces it on mount, so it
+ * borrows the card look rather than inventing one.
+ */
+.prose {
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 22px;
+  box-shadow: 8px 8px 0 rgba(36, 28, 59, 0.9);
+  padding: 16px 18px 20px;
+  margin-bottom: 20px;
+  min-width: 0;
+}
+
+.prose p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.prose a {
+  color: var(--ink);
+  text-underline-offset: 3px;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.prose th,
+.prose td {
+  text-align: left;
+  padding: 7px 8px;
+  border-bottom: 1px solid rgba(36, 28, 59, 0.15);
+  vertical-align: top;
+}
+
+.prose th {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.prose td:first-child {
+  font-family: var(--mono);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.prose .stage {
+  max-width: 420px;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

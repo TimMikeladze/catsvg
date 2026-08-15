@@ -35,6 +35,9 @@ export function handleCatRequest(rawUrl: URL): SvgResponse {
           : 'public, max-age=31536000, s-maxage=31536000, immutable',
         'Access-Control-Allow-Origin': '*',
         'X-Cat-Seed': encodeURIComponent(req.seed),
+        // A random cat is a different image on every request, so there is
+        // nothing stable for an image index to point at.
+        ...(req.random ? { 'X-Robots-Tag': 'noindex' } : {}),
       },
     };
   } catch (err) {

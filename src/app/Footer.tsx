@@ -1,5 +1,6 @@
-export const GITHUB_URL = 'https://github.com/TimMikeladze/catsvg';
-export const AUTHOR_SITE = 'https://linesofcode.dev';
+import { AUTHOR_SITE, GITHUB_URL } from '../seo/site';
+
+export { AUTHOR_SITE, GITHUB_URL };
 
 /** Project + author links. */
 export function Footer() {

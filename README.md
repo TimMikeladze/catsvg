@@ -19,6 +19,7 @@ bun run dev        # app + image endpoint on http://localhost:5173
 bun run test       # vitest
 bun run typecheck
 bun run build      # tsc + vite build
+bun run images     # regenerate the favicon, touch icon and social card
 ```
 
 `bun run dev` serves the SPA *and* the `/cat/*` image endpoint through the same
@@ -91,8 +92,9 @@ src/cat/        the generator — pure, dependency-free, runs in browser or edge
   *.ts          the art: bodies, tails, heads, face, coats, accessories, scenes
 src/server/     handler.ts — URL ⇒ SVG response (status, body, headers)
 src/app/        the React studio
+src/seo/        site copy, meta + JSON-LD, sitemap, the crawler-facing prerender
 api/cat.ts      Vercel edge function wrapping the handler
-scripts/        favicon generator (`bun run favicon`)
+scripts/        brand images: favicon, touch icon, social card (`bun run images`)
 ```
 
 ## Deploying
@@ -104,12 +106,33 @@ Vercel, no configuration beyond the checked-in `vercel.json`, which rewrites
 vercel deploy
 ```
 
+## Being found
+
+The studio is a client-rendered SPA, so a crawler that does not run JavaScript
+would otherwise see an empty `#root` — and most answer-engine crawlers do not
+run JavaScript. `src/seo` is the fix, and the single source of truth for
+everything the site says about itself:
+
+| File | What it owns |
+| --- | --- |
+| `site.ts` | Title, description, intro, FAQ, snippets, example gallery |
+| `html.ts` | `<head>` tags, Open Graph / Twitter cards, JSON-LD, sitemap |
+| `shell.ts` | The static HTML injected into `#root` at build time |
+
+The `seo` plugin in `vite.config.ts` injects the head and the prerender into
+`index.html`, and emits `sitemap.xml`. The same `site.ts` constants feed the
+React `ApiDocs` and `Faq` components, so what a crawler reads and what a visitor
+sees cannot drift apart.
+
+Structured data is one `@graph`: `WebSite`, `WebApplication`, `WebPage`,
+`FAQPage` and the author. Every generated cat carries a `<title>` and `<desc>`
+naming it, so inline SVGs are readable to screen readers too.
+
+`bun run images` regenerates `public/favicon.svg`, `public/apple-touch-icon.png`
+and the 1200×630 `public/og.png` social card — all drawn by the same generator
+that serves the API.
+
 ## Credits
 
 Created by [Tim Mikeladze](https://linesofcode.dev) —
 [linesofcode.dev](https://linesofcode.dev) · [@linesofcode](https://x.com/linesofcode)
-
-## Origin
-
-`mvp.html` is the original single-file prototype this was built from. It is
-kept for reference; the app no longer uses it.

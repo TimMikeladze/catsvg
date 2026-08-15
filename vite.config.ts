@@ -2,6 +2,8 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import type { Connect, Plugin } from 'vite';
 import { handleCatRequest } from './src/server/handler';
+import { HOME, fullHead, sitemapXml } from './src/seo/html';
+import { homeShell } from './src/seo/shell';
 
 /** URL prefixes handled by the image API rather than the SPA. */
 const API_PREFIXES = new Set(['cat', 'cats', 'i']);
@@ -27,8 +29,39 @@ function catApi(): Plugin {
   };
 }
 
+/**
+ * Everything a crawler needs: the `<head>`, the structured data and a
+ * prerendered home page, plus the sitemap. React replaces the prerender when it
+ * mounts, so both readings of the page say the same thing.
+ */
+function seo(): Plugin {
+  return {
+    name: 'seo',
+    transformIndexHtml(html) {
+      // Head-first, so <meta charset> lands well inside the first 1024 bytes a
+      // parser reads rather than behind whatever Vite injected.
+      return html
+        .replace('<head>', `<head>\n    ${fullHead(HOME)}`)
+        .replace('<div id="root"></div>', `<div id="root">${homeShell()}\n    </div>`);
+    },
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const path = (req.url ?? '/').split('?')[0];
+        if (path === '/sitemap.xml') {
+          res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+          return void res.end(sitemapXml());
+        }
+        next();
+      });
+    },
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: sitemapXml() });
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), catApi()],
+  plugins: [react(), catApi(), seo()],
   test: {
     environment: 'jsdom',
     globals: true,

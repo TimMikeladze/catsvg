@@ -7,6 +7,7 @@ import { eyesG, faceG, lashesG, mouthG, noseG, whiskersG } from './face';
 import { frameG, sceneG, tintG, toneOf } from './scenes';
 import { tailLayer } from './tails';
 import { N, hash, mix, rng } from './rng';
+import { catName } from './traits';
 import type { Frame, Traits } from './types';
 
 /** The square the cat itself is drawn in. Everything else stretches around it. */
@@ -53,6 +54,20 @@ function captionG(text: string, f: Frame, C: { cream: string }, ink: string): st
   return `<g><rect x="${N(x)}" y="${N(y)}" width="${N(w)}" height="${N(h)}" rx="${N(h / 2)}" fill="${C.cream}" opacity=".92"/><text x="200" y="${N(y + h / 2 + fs * 0.35)}" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-weight="600" font-size="${N(fs)}" fill="${ink}">${label}</text></g>`;
 }
 
+/**
+ * The accessible name and description of a cat. Screen readers read these, and
+ * so does anything indexing the SVG when it is inlined in a page.
+ */
+export function describeCat(t: Traits): { title: string; desc: string } {
+  const coat = t.coat === 'solid' ? 'solid' : t.coat;
+  return {
+    title: `${catName(t.seed)} — a cat placeholder image`,
+    desc:
+      `A geometric ${coat} cat in the ${t.palette} palette, sitting in a ${t.scene} scene ` +
+      `with ${t.eyes} eyes, ${t.ears} ears and a ${t.tail} tail. Generated from the seed “${t.seed}”.`,
+  };
+}
+
 /** Render a cat to a standalone SVG document string. */
 export function renderCat(t: Traits, opts: RenderOptions = {}): string {
   const width = Math.round(opts.width ?? ART);
@@ -75,7 +90,10 @@ export function renderCat(t: Traits, opts: RenderOptions = {}): string {
   const sc = SIZES[t.size] ?? 1;
   const rot = POSTURES[t.posture] ?? 0;
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${N(f.x)} ${N(f.y)} ${N(f.w)} ${N(f.h)}" width="${width}" height="${height}" role="img" aria-label="A geometric cat">
+  const about = describeCat(t);
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${N(f.x)} ${N(f.y)} ${N(f.w)} ${N(f.h)}" width="${width}" height="${height}" role="img" aria-labelledby="t${u} d${u}">
+<title id="t${u}">${escapeXml(about.title)}</title><desc id="d${u}">${escapeXml(about.desc)}</desc>
 <defs>
 <clipPath id="b${u}"><path d="${body.d}"/></clipPath>
 <clipPath id="h${u}"><path d="${hp}"/></clipPath>
@@ -117,11 +135,14 @@ export function renderSheet(cats: Traits[], cols = 3, cell = 400): string {
   const rows = Math.ceil(cats.length / cols);
   const inner = cats
     .map((t, i) => {
+      // One document, one accessible name: the per-cat <title>/<desc> pair has
+      // to go, or the sheet announces itself nine times over.
       const art = renderCat(t, { width: cell, height: cell })
         .replace(/^<svg[^>]*>/, '')
+        .replace(/<title id="t[^"]*">[\s\S]*?<\/desc>/, '')
         .replace(/<\/svg>$/, '');
       return `<g transform="translate(${(i % cols) * cell},${Math.floor(i / cols) * cell}) scale(${cell / ART})">${art}</g>`;
     })
     .join('');
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${cols * cell} ${rows * cell}" width="${cols * cell}" height="${rows * cell}">${inner}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${cols * cell} ${rows * cell}" width="${cols * cell}" height="${rows * cell}" role="img" aria-labelledby="sheet-title"><title id="sheet-title">A contact sheet of ${cats.length} cat placeholder images</title>${inner}</svg>`;
 }

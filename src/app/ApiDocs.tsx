@@ -1,23 +1,19 @@
-const ROUTES: Array<[string, string]> = [
-  ['/cat/mackerel.svg', 'Seeded cat, 400×400.'],
-  ['/cat/240/mackerel.svg', 'Square at 240px.'],
-  ['/cat/1200x300/mackerel.svg', 'Any width×height up to 2000.'],
-  ['/cat/320x320/random.svg', 'A different cat every request (never cached).'],
-  ['/cat/400?seed=biscuit', 'Query form — same thing.'],
-];
-
-const PARAMS: Array<[string, string]> = [
-  ['seed', 'Any string. Same seed always returns the same cat.'],
-  ['w, h', 'Size override, 16–2000px.'],
-  ['preset', 'anything · minimal · maximal · noir · pastel · feral'],
-  ['text', 'Caption pill, e.g. text=1200x300.'],
-  ['<trait>', 'Pin one trait: eyes=star, palette=neon, body=loaf, …'],
-];
+import { PARAMS, ROUTES, SNIPPETS } from '../seo/site';
 
 /** Reference for the image endpoint. */
 export function ApiDocs() {
   return (
     <div className="card docs">
+      <h2>Use it anywhere</h2>
+      <ul className="snippet-list">
+        {SNIPPETS.map((s) => (
+          <li key={s.label}>
+            <span className="snippet-label">{s.label}</span>
+            <code className="mono">{s.code}</code>
+          </li>
+        ))}
+      </ul>
+
       <h2>URL API</h2>
       <table>
         <thead>

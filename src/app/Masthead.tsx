@@ -1,5 +1,5 @@
 import { COMBOS } from '../cat/spec';
-import { GITHUB_URL } from './Footer';
+import { GITHUB_URL, TAGLINE } from '../seo/site';
 
 /**
  * `COMBOS` is ~10²⁶, where `Intl` compact notation gives up and prints
@@ -32,7 +32,7 @@ export function Masthead() {
     <header className="masthead">
       <div className="brand">
         <h1>CatSVG</h1>
-        <p className="lede">Cat placeholder images — any size, any seed, pure SVG.</p>
+        <p className="lede">{TAGLINE}</p>
       </div>
 
       <div className="masthead-side">

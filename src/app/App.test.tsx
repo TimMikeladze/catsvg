@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from './App';
+import { FAQ } from '../seo/site';
 
 const seedLine = () => screen.getByText(/^seed · /, { selector: '.seedline' }).textContent ?? '';
 
@@ -18,6 +19,12 @@ describe('App', () => {
     expect(screen.getByRole('heading', { name: 'CatSVG' })).toBeInTheDocument();
     expect(document.querySelector('.stage svg')).toBeInTheDocument();
     expect(screen.getAllByLabelText(/^Keep /)).toHaveLength(9);
+  });
+
+  it('shows the same questions the crawler-facing HTML answers', () => {
+    render(<App />);
+    expect(screen.getByText(FAQ[0].q)).toBeInTheDocument();
+    expect(screen.getAllByRole('definition')).toHaveLength(FAQ.length);
   });
 
   it('rolls a new cat', async () => {
