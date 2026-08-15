@@ -6,7 +6,7 @@ A cat-based image placeholder service. Every URL is a cat, rendered as pure SVG
 by a deterministic generator — no image files, no storage, no network calls.
 
 ```html
-<img src="https://your-deploy.example/cat/1200x300/mackerel.svg" width="1200" height="300" />
+<img src="https://catsvg.vercel.app/cat/1200x300/mackerel.svg" width="1200" height="300" />
 ```
 
 Same seed, same cat, forever. ~2.9 × 10¹⁴ combinations.
