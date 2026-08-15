@@ -73,8 +73,10 @@ export function homeShell(): string {
   return `
     <header class="masthead">
       <div class="brand">
-        <h1>${SITE_NAME}</h1>
-        <p class="lede">${escapeHtml(TAGLINE)}</p>
+        <div class="brand-copy">
+          <h1>${SITE_NAME}</h1>
+          <p class="lede">${escapeHtml(TAGLINE)}</p>
+        </div>
       </div>
     </header>
 
