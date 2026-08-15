@@ -1,3 +1,5 @@
+import { buildCatPath } from '../cat/url';
+
 /**
  * One source of truth for everything search engines, social cards, the static
  * prerender and the app itself need to say about this site. Anything a crawler
@@ -71,13 +73,17 @@ export const ROUTES: Array<[string, string]> = [
   ['/cat/1200x300/mackerel.svg', 'Any width×height up to 2000.'],
   ['/cat/320x320/random.svg', 'A different cat every request (never cached).'],
   ['/cat/400?seed=biscuit', 'Query form — same thing.'],
+  ['/cat/postcard/mackerel.svg', 'The same cat as a postcard, 600×400.'],
+  ['/cat/postcard/back/900x600/mackerel.svg', 'The written side: message, stamp, postmark.'],
 ];
 
 export const PARAMS: Array<[string, string]> = [
   ['seed', 'Any string. Same seed always returns the same cat.'],
   ['w, h', 'Size override, 16–2000px.'],
   ['preset', 'anything · minimal · maximal · noir · pastel · feral'],
-  ['text', 'Caption pill, e.g. text=1200x300.'],
+  ['mode', 'cat (default) or postcard.'],
+  ['side', 'front or back — the two sides of a postcard.'],
+  ['text', 'Caption pill on a cat; the greeting or message on a postcard.'],
   ['<trait>', 'Pin one trait: eyes=star, palette=neon, body=loaf, …'],
 ];
 
@@ -94,6 +100,10 @@ export const SNIPPETS: Array<{ label: string; code: string }> = [
   {
     label: 'CSS',
     code: `background-image: url("${SITE_URL}/cat/1200x600/pebble.svg");`,
+  },
+  {
+    label: 'Postcard',
+    code: `<img src="${SITE_URL}/cat/postcard/900x600/mackerel.svg" width="900" height="600" alt="A postcard from a cat" />`,
   },
   {
     label: 'Avatar',
@@ -136,6 +146,10 @@ export const FAQ: Array<{ q: string; a: string }> = [
     a: 'Yes. Pass a user id, username or email hash as the seed and every person gets their own stable cat, the way an identicon works — but a cat.',
   },
   {
+    q: 'What is postcard mode?',
+    a: 'Postcard mode mounts the same generated cat on a paper card. /cat/postcard/mackerel.svg is the picture side — the cat in a window with a greeting printed under it — and /cat/postcard/back/mackerel.svg is the written side, with a message, a stamp carrying a miniature of the same cat, a postmark and the address rules. Add ?text=… to write the greeting or the message yourself; leave it off and the cat writes its own.',
+  },
+  {
     q: 'Can I run CatSVG myself?',
     a: 'Yes. The whole thing is open source on GitHub: the generator is a dependency-free TypeScript module and the service is a single function you can host anywhere.',
   },
@@ -148,11 +162,16 @@ export interface GalleryItem {
   /** What this size is for — the caption and the alt text lean on it. */
   use: string;
   preset?: string;
+  /** `postcard` mounts the cat on a card; omit for a plain cat. */
+  mode?: 'cat' | 'postcard';
+  side?: 'front' | 'back';
 }
 
 /** Worked examples, ordered by how often people need that shape. */
 export const GALLERY: GalleryItem[] = [
   { seed: 'mackerel', width: 1200, height: 300, use: 'Wide banner' },
+  { seed: 'clementine', width: 600, height: 400, use: 'Postcard, picture side', mode: 'postcard' },
+  { seed: 'clementine', width: 600, height: 400, use: 'Postcard, written side', mode: 'postcard', side: 'back' },
   { seed: 'biscuit', width: 800, height: 450, use: 'Card image, 16:9' },
   { seed: 'pebble', width: 600, height: 800, use: 'Portrait crop' },
   { seed: 'juniper', width: 400, height: 400, use: 'Square thumbnail' },
@@ -160,14 +179,19 @@ export const GALLERY: GalleryItem[] = [
   { seed: 'domino', width: 96, height: 96, use: 'Small avatar' },
 ];
 
-/** The path a gallery item is served from. */
-export const galleryPath = (item: GalleryItem): string => {
-  const size = item.width === item.height ? `${item.width}` : `${item.width}x${item.height}`;
-  return `/cat/${size}/${item.seed}.svg${item.preset ? `?preset=${item.preset}` : ''}`;
-};
+/** The path a gallery item is served from — the same builder the app uses. */
+export const galleryPath = (item: GalleryItem): string =>
+  buildCatPath({
+    seed: item.seed,
+    width: item.width,
+    height: item.height,
+    preset: item.preset,
+    mode: item.mode,
+    side: item.side,
+  });
 
 /** Alt text for a gallery item — descriptive, not keyword soup. */
 export const galleryAlt = (item: GalleryItem): string =>
-  `${item.use}: a ${item.width}×${item.height} cat placeholder image, seed "${item.seed}"${
-    item.preset ? `, ${item.preset} preset` : ''
-  }`;
+  `${item.use}: a ${item.width}×${item.height} ${
+    item.mode === 'postcard' ? 'cat postcard image' : 'cat placeholder image'
+  }, seed "${item.seed}"${item.preset ? `, ${item.preset} preset` : ''}`;

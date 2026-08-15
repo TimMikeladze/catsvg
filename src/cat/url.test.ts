@@ -55,6 +55,38 @@ describe('parseCatUrl', () => {
     expect(parse('/cat/a.svg?preset=bogus').preset).toBe('anything');
   });
 
+  it('reads postcard mode off the path', () => {
+    expect(parse('/cat/postcard/mackerel.svg')).toMatchObject({
+      mode: 'postcard',
+      side: 'front',
+      seed: 'mackerel',
+      width: 600,
+      height: 400,
+    });
+    expect(parse('/cat/postcard/back/900x600/mackerel.svg')).toMatchObject({
+      mode: 'postcard',
+      side: 'back',
+      width: 900,
+      height: 600,
+    });
+  });
+
+  it('reads postcard mode off the query', () => {
+    expect(parse('/cat/mackerel.svg?mode=postcard')).toMatchObject({ mode: 'postcard', side: 'front' });
+    // Asking for a side is asking for a postcard.
+    expect(parse('/cat/mackerel.svg?side=back')).toMatchObject({ mode: 'postcard', side: 'back' });
+    expect(parse('/cat/postcard/mackerel.svg?mode=cat')).toMatchObject({ mode: 'cat' });
+  });
+
+  it('keeps a postcard 3:2 when only one dimension is given', () => {
+    expect(parse('/cat/postcard/300/mackerel.svg')).toMatchObject({ width: 300, height: 200 });
+    expect(parse('/cat/300/mackerel.svg')).toMatchObject({ width: 300, height: 300 });
+  });
+
+  it('leaves plain cats alone', () => {
+    expect(parse('/cat/mackerel.svg')).toMatchObject({ mode: 'cat', width: 400, height: 400 });
+  });
+
   it('decodes seeds with spaces and unicode', () => {
     expect(parse('/cat/' + encodeURIComponent('grey tabby 🐈') + '.svg').seed).toBe('grey tabby 🐈');
   });
@@ -79,6 +111,19 @@ describe('buildCatPath', () => {
     });
   });
 
+  it('round-trips a postcard, side and all', () => {
+    const path = buildCatPath({ seed: 'mackerel', mode: 'postcard', side: 'back', text: 'Send fish' });
+    expect(path).toBe('/cat/postcard/back/600x400/mackerel.svg?text=Send+fish');
+    expect(parse(path)).toMatchObject({
+      seed: 'mackerel',
+      mode: 'postcard',
+      side: 'back',
+      width: 600,
+      height: 400,
+      text: 'Send fish',
+    });
+  });
+
   it('collapses equal dimensions to one segment', () => {
     expect(buildCatPath({ seed: 'x', width: 300, height: 300 })).toBe('/cat/300/x.svg');
   });
@@ -89,5 +134,13 @@ describe('renderCatRequest', () => {
     const svg = renderCatRequest(parse('/cat/1200x300/mackerel.svg?eyes=star'));
     expect(svg).toContain('width="1200"');
     expect(svg).toContain('height="300"');
+  });
+
+  it('renders a postcard when the URL asks for one', () => {
+    const svg = renderCatRequest(parse('/cat/postcard/back/900x600/mackerel.svg?text=Send+fish'));
+    expect(svg).toContain('width="900"');
+    expect(svg).toContain('A postcard from');
+    expect(svg).toContain('Send fish');
+    expect(svg).toContain('1 CAT');
   });
 });

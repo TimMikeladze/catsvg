@@ -406,6 +406,13 @@ input[type='number'] {
   color: var(--ink);
 }
 
+/* A text field that owns its row, like the greeting on a postcard. */
+input[type='text'].block {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
 input:focus-visible,
 select:focus-visible {
   outline: 3px solid var(--grape);

@@ -72,6 +72,36 @@ describe('App', () => {
     expect((screen.getByLabelText('Cat image URL') as HTMLInputElement).value).toContain('/cat/1200x300/');
   });
 
+  it('turns the cat into a postcard and back', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    fireEvent.change(screen.getByLabelText('Seed word'), { target: { value: 'mackerel' } });
+    await user.click(screen.getByRole('button', { name: 'Go' }));
+
+    await user.click(screen.getByRole('button', { name: 'Postcard' }));
+    const url = () => (screen.getByLabelText('Cat image URL') as HTMLInputElement).value;
+    // A postcard defaults to a card shape rather than the cat's square.
+    expect(url()).toContain('/cat/postcard/600x400/mackerel.svg');
+    expect(document.querySelector('.stage svg')?.getAttribute('viewBox')).toBe('0 0 400 267');
+
+    await user.click(screen.getByRole('button', { name: 'Back' }));
+    expect(url()).toContain('/cat/postcard/back/600x400/mackerel.svg');
+
+    await user.click(screen.getByRole('button', { name: 'Plain cat' }));
+    expect(url()).toContain('/cat/400/mackerel.svg');
+  });
+
+  it('writes the greeting on the postcard and into the URL', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: 'Postcard' }));
+    fireEvent.change(screen.getByLabelText('Greeting'), { target: { value: 'Greetings from Hull' } });
+    expect(document.querySelector('.stage svg')?.innerHTML).toContain('Greetings from Hull');
+    expect((screen.getByLabelText('Cat image URL') as HTMLInputElement).value).toContain(
+      'text=Greetings+from+Hull',
+    );
+  });
+
   it('loads a pasted cat URL', async () => {
     const user = userEvent.setup();
     render(<App />);

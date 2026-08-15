@@ -1,20 +1,24 @@
 import { useEffect, useState } from 'react';
-import { CatSvg } from './CatSvg';
+import { CatSvg, PostcardSvg } from './CatSvg';
 import { NARROW, useMediaQuery } from './useMediaQuery';
 import { TRAIT_LABEL } from '../cat/spec';
 import { catName } from '../cat/traits';
-import type { Locks, TraitKey, Traits } from '../cat/types';
+import type { TraitKey } from '../cat/types';
+import type { CatMachine } from './useCatMachine';
 
 const CHIP_ORDER = Object.keys(TRAIT_LABEL) as TraitKey[];
 
+/** How wide the hero is drawn, whatever size the URL is pointed at. */
+const STAGE_WIDTH = 400;
+
 export interface StageProps {
-  traits: Traits;
-  locks: Locks;
-  onToggleLock: (key: TraitKey) => void;
+  machine: CatMachine;
 }
 
-/** The hero cat, its name, and one lockable chip per trait. */
-export function Stage({ traits, locks, onToggleLock }: StageProps) {
+/** The hero cat — or postcard — its name, and one lockable chip per trait. */
+export function Stage({ machine }: StageProps) {
+  const { traits, locks, mode, side, text, width, height } = machine;
+  const onToggleLock = machine.toggleLock;
   // Twenty-odd chips push everything else off a phone screen, so they fold
   // away there and stay open in the wide column.
   const narrow = useMediaQuery(NARROW);
@@ -25,7 +29,19 @@ export function Stage({ traits, locks, onToggleLock }: StageProps) {
 
   return (
     <div className="card stage">
-      <div className="artboard"><CatSvg traits={traits} width={400} /></div>
+      <div className="artboard">
+        {mode === 'postcard' ? (
+          <PostcardSvg
+            traits={traits}
+            width={STAGE_WIDTH}
+            height={Math.round((STAGE_WIDTH * height) / width)}
+            side={side}
+            text={text}
+          />
+        ) : (
+          <CatSvg traits={traits} width={STAGE_WIDTH} />
+        )}
+      </div>
       <div className="cat-id">
         <div>
           <div className="name">{catName(traits.seed)}</div>

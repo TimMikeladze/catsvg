@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { NARROW, useMediaQuery } from './useMediaQuery';
 import { PRESET_NAMES, TRAIT_OPTIONS } from '../cat/spec';
 import { renderCat, renderSheet } from '../cat/render';
+import { greetingFor, noteFor, renderPostcard } from '../cat/postcard';
 import { makeTraits, newSeed } from '../cat/traits';
 import { copyText, downloadPng, downloadSvg } from './download';
 import type { TraitKey } from '../cat/types';
@@ -49,7 +50,8 @@ export interface ControlsProps {
 
 /** Roll / export / preset / seed / per-trait tinkering. */
 export function Controls({ machine }: ControlsProps) {
-  const { traits, locks, preset, width, height } = machine;
+  const { traits, locks, preset, width, height, mode, side, text } = machine;
+  const postcard = mode === 'postcard';
   const [seedDraft, setSeedDraft] = useState('');
   const [copyLabel, setCopyLabel] = useState('Copy SVG code');
 
@@ -60,7 +62,12 @@ export function Controls({ machine }: ControlsProps) {
   useEffect(() => setTinkerOpen(!narrow), [narrow]);
   const lockCount = Object.keys(locks).length;
 
-  const currentSvg = () => renderCat(traits, { width, height });
+  // Every export follows whatever is on the stage, postcard included.
+  const currentSvg = () =>
+    postcard
+      ? renderPostcard(traits, { width, height, side, text })
+      : renderCat(traits, { width, height });
+  const fileStem = postcard ? `postcard-${side}-${traits.seed}` : `cat-${traits.seed}`;
 
   const onCopy = async () => {
     const ok = await copyText(currentSvg());
@@ -96,7 +103,7 @@ export function Controls({ machine }: ControlsProps) {
         <button
           type="button"
           className="ghost sm"
-          onClick={() => downloadSvg(`cat-${traits.seed}.svg`, currentSvg())}
+          onClick={() => downloadSvg(`${fileStem}.svg`, currentSvg())}
         >
           Download SVG
         </button>
@@ -105,7 +112,10 @@ export function Controls({ machine }: ControlsProps) {
           className="ghost sm"
           onClick={() => {
             const pngHeight = Math.round((800 * height) / width);
-            void downloadPng(`cat-${traits.seed}.png`, renderCat(traits, { width: 800, height: pngHeight }), 800, pngHeight);
+            const svg = postcard
+              ? renderPostcard(traits, { width: 800, height: pngHeight, side, text })
+              : renderCat(traits, { width: 800, height: pngHeight });
+            void downloadPng(`${fileStem}.png`, svg, 800, pngHeight);
           }}
         >
           Download PNG
@@ -136,6 +146,42 @@ export function Controls({ machine }: ControlsProps) {
           </option>
         ))}
       </select>
+
+      <h2>Postcard</h2>
+      <div className="sizes">
+        <button type="button" aria-pressed={!postcard} onClick={() => machine.setMode('cat')}>
+          Plain cat
+        </button>
+        <button type="button" aria-pressed={postcard} onClick={() => machine.setMode('postcard')}>
+          Postcard
+        </button>
+      </div>
+      {postcard && (
+        <>
+          <div className="sizes" style={{ marginTop: 8 }}>
+            <button type="button" aria-pressed={side === 'front'} onClick={() => machine.setSide('front')}>
+              Front
+            </button>
+            <button type="button" aria-pressed={side === 'back'} onClick={() => machine.setSide('back')}>
+              Back
+            </button>
+          </div>
+          <input
+            type="text"
+            className="block"
+            value={text}
+            aria-label={side === 'front' ? 'Greeting' : 'Message'}
+            placeholder={side === 'front' ? greetingFor(traits.seed) : noteFor(traits.seed)}
+            maxLength={240}
+            onChange={(e) => machine.setText(e.target.value)}
+          />
+          <p className="hint">
+            {side === 'front'
+              ? 'Printed under the picture. Leave it empty and the cat picks where it is writing from.'
+              : 'Written on the back. Leave it empty and the cat writes its own note.'}
+          </p>
+        </>
+      )}
 
       <h2>Seed</h2>
       <div className="seedrow">
