@@ -15,6 +15,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "images": "bun scripts/images.ts",
+    "readme:images": "bun scripts/readme-images.ts",
     "art:audit": "bun scripts/audit-art.ts"
   },
   "dependencies": {

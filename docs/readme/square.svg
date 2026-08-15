@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" role="img" aria-labelledby="tc1fs2d7b dc1fs2d7b">
+<title id="tc1fs2d7b">Pickle the Nocturnal — a cat placeholder image</title><desc id="dc1fs2d7b">A geometric chevron cat in the cocoa palette, sitting in a horizon scene with half eyes, satellite ears and a scurve tail. Generated from the seed “juniper”.</desc>
+<defs>
+<clipPath id="bc1fs2d7b"><path d="M144,242 C124,280 118,326 122,356 L278,356 C282,320 270,280 254,242 C226,226 172,226 144,242 Z"/></clipPath>
+<clipPath id="hc1fs2d7b"><path d="M124,182 L108,120 L118,86 L176,122
+      L224,122 L282,86 L292,120 L276,182
+      C275,224 248,248 200,250 C152,248 125,224 124,182 Z"/></clipPath>
+<clipPath id="fc1fs2d7b"><rect x="0" y="0" width="400" height="400" rx="14"/></clipPath>
+</defs>
+<g clip-path="url(#fc1fs2d7b)">
+<rect x="0" y="0" width="400" height="400" fill="#E8D9C5"/><rect x="0" y="252" width="400" height="148" fill="#4A2F23" opacity=".16"/><path d="M0,252 H400" stroke="#FFF8EC" stroke-width="4" opacity=".3"/>
+<ellipse cx="200" cy="362" rx="118" ry="14" fill="#4A2F23" opacity=".16"/>
+<g transform="translate(200,368) scale(1) rotate(0) translate(-200,-368)">
+<g><path d="M276,344 C338,350 306,304 352,274" fill="none" stroke="#4A2F23" stroke-width="18" stroke-linecap="round"/><path d="M276,344 C338,350 306,304 352,274" pathLength="100" fill="none" stroke="#674431" stroke-width="18" stroke-dasharray="7 9"/></g>
+
+<path d="M144,242 C124,280 118,326 122,356 L278,356 C282,320 270,280 254,242 C226,226 172,226 144,242 Z" fill="#9C6B4A"/>
+<g clip-path="url(#bc1fs2d7b)"><path d="M80,232 L200,254 L320,232 v14 L200,268 L80,246 Z" fill="#674431" opacity=".75"/><path d="M80,258 L200,280 L320,258 v14 L200,294 L80,272 Z" fill="#674431" opacity=".75"/><path d="M80,284 L200,306 L320,284 v14 L200,320 L80,298 Z" fill="#674431" opacity=".75"/><path d="M80,310 L200,332 L320,310 v14 L200,346 L80,324 Z" fill="#674431" opacity=".75"/><path d="M80,336 L200,358 L320,336 v14 L200,372 L80,350 Z" fill="#674431" opacity=".75"/><path d="M80,362 L200,384 L320,362 v14 L200,398 L80,376 Z" fill="#674431" opacity=".75"/></g>
+<rect x="158" y="343" width="46" height="17" rx="8.5" fill="#FFF8EC" transform="rotate(-8 181 351)"/><rect x="196" y="341" width="46" height="17" rx="8.5" fill="#FFF8EC" transform="rotate(6 219 349)"/>
+<g><ellipse cx="176" cy="307" rx="18" ry="11" fill="#FFF8EC" transform="rotate(18 176 307)"/><ellipse cx="224" cy="307" rx="18" ry="11" fill="#FFF8EC" transform="rotate(-18 224 307)"/><g transform="translate(200,300) scale(.94) translate(-200,-300)"><path d="M200,306 q30,-30 84,-52" stroke="#4A2F23" stroke-width="2" fill="none"/><ellipse cx="292" cy="216" rx="26" ry="31" fill="#3F7D6E"/><path d="M292,247 l-7,10 14,0 Z" fill="#3F7D6E"/></g></g>
+<g transform="translate(200,178) scale(0.9,1.1) translate(-200,-178)">
+  <path d="M124,182 L108,120 L118,86 L176,122
+      L224,122 L282,86 L292,120 L276,182
+      C275,224 248,248 200,250 C152,248 125,224 124,182 Z" fill="#4A2F23"/>
+  <g clip-path="url(#hc1fs2d7b)"><circle cx="144" cy="138" r="3" fill="#674431" opacity=".72"/><circle cx="165" cy="128" r="2.3" fill="#674431" opacity=".72"/><circle cx="188" cy="135" r="2.3" fill="#674431" opacity=".72"/><circle cx="212" cy="128" r="3" fill="#674431" opacity=".72"/><circle cx="236" cy="137" r="2.3" fill="#674431" opacity=".72"/><circle cx="255" cy="130" r="2.3" fill="#674431" opacity=".72"/><circle cx="153" cy="151" r="3" fill="#674431" opacity=".72"/><circle cx="178" cy="147" r="2.3" fill="#674431" opacity=".72"/><circle cx="203" cy="151" r="2.3" fill="#674431" opacity=".72"/><circle cx="227" cy="146" r="3" fill="#674431" opacity=".72"/><circle cx="249" cy="154" r="2.3" fill="#674431" opacity=".72"/><circle cx="196" cy="140" r="2.3" fill="#674431" opacity=".72"/></g>
+  <path d="M120,98 L166,128 L126,130 Z" fill="#3F7D6E" opacity=".5"/>
+      <path d="M280,98 L234,128 L274,130 Z" fill="#3F7D6E" opacity=".5"/>
+  <g stroke="#FFF8EC" stroke-width="2.6" stroke-linecap="round" fill="none" opacity=".8"><path d="M178,208 L96,196"/><path d="M178,214 L100,228"/><path d="M222,208 L304,196"/><path d="M222,214 L300,228"/></g>
+  <g><path d="M156,170 a14,14 0 0,1 28,0 z" fill="#FFF8EC"/><circle cx="170" cy="169" r="5" fill="#211510"/><path d="M156,170 h28" stroke="#211510" stroke-width="3" stroke-linecap="round"/><path d="M216,170 a14,14 0 0,1 28,0 z" fill="#FFF8EC"/><circle cx="230" cy="169" r="5" fill="#211510"/><path d="M216,170 h28" stroke="#211510" stroke-width="3" stroke-linecap="round"/></g>
+  
+  <path d="M200,213 C187,203 190,196 196,201 C199,203 201,203 204,201 C210,196 213,203 200,213 Z" fill="#3F7D6E"/>
+  <path d="M200,210 v6 M200,216 q-9,7 -15,-1 M200,216 q9,7 15,-1" stroke="#211510" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M202,218 q10,2 8,12 q-8,4 -10,-6 Z" fill="#3F7D6E"/>
+  <path d="M142,150 L264,134" stroke="#17151F" stroke-width="6"/><path d="M144,154 L196,160 L194,194 L146,190 Z" fill="#17151F" stroke="#FFF8EC" stroke-width="2"/>
+</g>
+<g><g fill="#FFF8EC" font-family="monospace" font-weight="700"><text x="286" y="106" font-size="34">Z</text><text x="314" y="136" font-size="24">z</text><text x="266" y="146" font-size="18">z</text></g></g>
+</g>
+<circle cx="62" cy="346" r="18" fill="#9C6B4A"/><path d="M44,346 a18,18 0 0,0 36,0" fill="#3F7D6E"/>
+<rect x="0" y="0" width="400" height="400" fill="#FBF9F3" opacity=".18"/>
+
+
+</g>
+</svg>
