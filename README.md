@@ -1,12 +1,12 @@
 # CatSVG
 
-**[catsvg.vercel.app](https://catsvg.vercel.app)**
+**[catsvg.app](https://catsvg.app)**
 
 A cat-based image placeholder service. Every URL is a cat, rendered as pure SVG
 by a deterministic generator — no image files, no storage, no network calls.
 
 ```html
-<img src="https://catsvg.vercel.app/cat/1200x300/mackerel.svg" width="1200" height="300" />
+<img src="https://catsvg.app/cat/1200x300/mackerel.svg" width="1200" height="300" />
 ```
 
 Same seed, same cat, forever. ~1.7 × 10²³ combinations.
@@ -107,6 +107,10 @@ Vercel, no configuration beyond the checked-in `vercel.json`, which rewrites
 vercel deploy
 ```
 
+`catsvg.app` is the canonical origin. `catsvg.dev`, both `www` hosts and the
+`catsvg.vercel.app` deploy URL are 308 redirects onto it, configured as project
+domains on Vercel rather than in this repo.
+
 ## Being found
 
 The studio is a client-rendered SPA, so a crawler that does not run JavaScript
@@ -117,13 +121,17 @@ everything the site says about itself:
 | File | What it owns |
 | --- | --- |
 | `site.ts` | Title, description, intro, FAQ, snippets, example gallery |
-| `html.ts` | `<head>` tags, Open Graph / Twitter cards, JSON-LD, sitemap |
+| `html.ts` | `<head>` tags, Open Graph / Twitter cards, JSON-LD, sitemap, robots.txt |
 | `shell.ts` | The static HTML injected into `#root` at build time |
 
 The `seo` plugin in `vite.config.ts` injects the head and the prerender into
-`index.html`, and emits `sitemap.xml`. The same `site.ts` constants feed the
-React `ApiDocs` and `Faq` components, so what a crawler reads and what a visitor
-sees cannot drift apart.
+`index.html`, and emits `sitemap.xml` and `robots.txt`. The same `site.ts`
+constants feed the React `ApiDocs` and `Faq` components, so what a crawler reads
+and what a visitor sees cannot drift apart.
+
+`SITE_URL` in `site.ts` is the one place the canonical origin is written down —
+canonical links, Open Graph URLs, JSON-LD ids, the sitemap, the robots.txt
+`Sitemap:` line and every copy-paste snippet are derived from it.
 
 Structured data is one `@graph`: `WebSite`, `WebApplication`, `WebPage`,
 `FAQPage` and the author. Every generated cat carries a `<title>` and `<desc>`

@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import type { Connect, Plugin } from 'vite';
 import { handleCatRequest } from './src/server/handler';
-import { HOME, fullHead, sitemapXml } from './src/seo/html';
+import { HOME, fullHead, robotsTxt, sitemapXml } from './src/seo/html';
 import { homeShell } from './src/seo/shell';
 
 /** URL prefixes handled by the image API rather than the SPA. */
@@ -31,8 +31,8 @@ function catApi(): Plugin {
 
 /**
  * Everything a crawler needs: the `<head>`, the structured data and a
- * prerendered home page, plus the sitemap. React replaces the prerender when it
- * mounts, so both readings of the page say the same thing.
+ * prerendered home page, plus the sitemap and robots.txt. React replaces the
+ * prerender when it mounts, so both readings of the page say the same thing.
  */
 function seo(): Plugin {
   return {
@@ -51,11 +51,16 @@ function seo(): Plugin {
           res.setHeader('Content-Type', 'application/xml; charset=utf-8');
           return void res.end(sitemapXml());
         }
+        if (path === '/robots.txt') {
+          res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+          return void res.end(robotsTxt());
+        }
         next();
       });
     },
     generateBundle() {
       this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: sitemapXml() });
+      this.emitFile({ type: 'asset', fileName: 'robots.txt', source: robotsTxt() });
     },
   };
 }

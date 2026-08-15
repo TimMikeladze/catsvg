@@ -4,7 +4,7 @@
  * reads should be derived from here rather than written twice.
  */
 
-export const SITE_URL = 'https://catsvg.vercel.app';
+export const SITE_URL = 'https://catsvg.app';
 export const SITE_NAME = 'CatSVG';
 export const GITHUB_URL = 'https://github.com/TimMikeladze/catsvg';
 export const AUTHOR = 'Tim Mikeladze';

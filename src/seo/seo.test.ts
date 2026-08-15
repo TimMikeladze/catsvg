@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fullHead, sitemapXml, structuredData } from './html';
+import { fullHead, robotsTxt, sitemapXml, structuredData } from './html';
 import { homeShell } from './shell';
 import { DESCRIPTION, FAQ, GALLERY, HOME, PAGES, SITE_URL, TITLE, galleryAlt, galleryPath } from './site';
 
@@ -90,5 +90,22 @@ describe('sitemap', () => {
     expect(xml).toContain('xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"');
     for (const page of PAGES) expect(xml).toContain(`<loc>${new URL(page.path, SITE_URL)}</loc>`);
     expect(xml.match(/<loc>/g)).toHaveLength(PAGES.length);
+  });
+});
+
+describe('canonical origin', () => {
+  it('never leaks the deploy URL into anything a crawler reads', () => {
+    expect(SITE_URL).toBe('https://catsvg.app');
+    for (const doc of [fullHead(HOME), homeShell(), sitemapXml(), robotsTxt()]) {
+      expect(doc).not.toContain('vercel.app');
+    }
+  });
+});
+
+describe('robots.txt', () => {
+  it('points at the sitemap on the canonical origin and keeps random cats out', () => {
+    const txt = robotsTxt();
+    expect(txt).toContain(`Sitemap: ${SITE_URL}/sitemap.xml`);
+    expect(txt).toContain('Disallow: /cat/*random');
   });
 });

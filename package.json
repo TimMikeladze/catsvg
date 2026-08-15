@@ -1,7 +1,10 @@
 {
-  "name": "cats",
+  "name": "catsvg",
   "private": true,
   "version": "0.1.0",
+  "description": "Cat placeholder images, drawn as SVG from the URL.",
+  "homepage": "https://catsvg.app",
+  "repository": { "type": "git", "url": "https://github.com/TimMikeladze/catsvg.git" },
   "license": "MIT",
   "type": "module",
   "scripts": {

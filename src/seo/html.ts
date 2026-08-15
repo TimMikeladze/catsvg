@@ -104,6 +104,7 @@ export function structuredData(page: Page): string {
       name: SITE_NAME,
       description: DESCRIPTION,
       inLanguage: 'en',
+      sameAs: [GITHUB_URL],
       author: { '@id': authorId },
       publisher: { '@id': authorId },
     },
@@ -167,6 +168,27 @@ export function sitemapXml(): string {
       `  <url>\n    <loc>${abs(p.path)}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>${p.priority}</priority>\n  </url>`,
   ).join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
+}
+
+/**
+ * robots.txt. Generated rather than checked in so the sitemap URL is the same
+ * `SITE_URL` everything else is built from and cannot drift when the domain
+ * changes.
+ */
+export function robotsTxt(): string {
+  return [
+    'User-agent: *',
+    'Allow: /',
+    '',
+    '# Cat images are cheap to generate and fine to index, but a `random` seed is a',
+    '# different cat on every request, so there is nothing stable there to crawl.',
+    'Disallow: /cat/*random',
+    'Disallow: /cats/*random',
+    'Disallow: /i/*random',
+    '',
+    `Sitemap: ${abs('/sitemap.xml')}`,
+    '',
+  ].join('\n');
 }
 
 export { HOME };
