@@ -87,6 +87,29 @@ describe('parseCatUrl', () => {
     expect(parse('/cat/mackerel.svg')).toMatchObject({ mode: 'cat', width: 400, height: 400 });
   });
 
+  it('reads the postcard fields', () => {
+    const r = parse('/cat/postcard/back/mackerel.svg?to=Sheehan&from=The+Cat&postmark=Hull&caption=est.+2026');
+    expect(r.card).toEqual({ to: 'Sheehan', from: 'The Cat', postmark: 'Hull', caption: 'est. 2026' });
+  });
+
+  it('reads the branding flag in whatever spelling', () => {
+    expect(parse('/cat/postcard/back/x.svg?brand=off').card).toEqual({ brand: false });
+    expect(parse('/cat/postcard/back/x.svg?brand=false').card).toEqual({ brand: false });
+    expect(parse('/cat/postcard/back/x.svg?brand=1').card).toEqual({ brand: true });
+    // Nothing said, nothing pinned — the renderer keeps its own defaults.
+    expect(parse('/cat/postcard/back/x.svg').card).toEqual({});
+    expect(parse('/cat/postcard/back/x.svg?brand=maybe').card).toEqual({});
+  });
+
+  it('reads the stamp count', () => {
+    expect(parse('/cat/postcard/back/x.svg?stamp=3').card).toEqual({ stamp: 3 });
+    expect(parse('/cat/postcard/back/x.svg?stamp=0').card).toEqual({ stamp: 0 });
+    expect(parse('/cat/postcard/back/x.svg?stamp=off').card).toEqual({ stamp: 0 });
+    expect(parse('/cat/postcard/back/x.svg?stamp=yes').card).toEqual({ stamp: 1 });
+    expect(parse('/cat/postcard/back/x.svg?stamp=99').card).toEqual({ stamp: 5 });
+    expect(parse('/cat/postcard/back/x.svg?stamp=lots').card).toEqual({});
+  });
+
   it('decodes seeds with spaces and unicode', () => {
     expect(parse('/cat/' + encodeURIComponent('grey tabby 🐈') + '.svg').seed).toBe('grey tabby 🐈');
   });
@@ -124,6 +147,19 @@ describe('buildCatPath', () => {
     });
   });
 
+  it('round-trips the postcard fields', () => {
+    const card = { to: 'Sheehan', from: 'The Cat', postmark: 'Hull', brand: false, stamp: 3 };
+    const path = buildCatPath({ seed: 'mackerel', mode: 'postcard', side: 'back', card });
+    expect(parse(path).card).toEqual(card);
+    // One stamp is the default, so it stays out of the URL.
+    const one = buildCatPath({ seed: 'x', mode: 'postcard', card: { stamp: 1 } });
+    expect(one).not.toContain('stamp');
+  });
+
+  it('leaves postcard fields out of a plain cat URL', () => {
+    expect(buildCatPath({ seed: 'x', card: { to: 'Sheehan', brand: false, stamp: 0 } })).toBe('/cat/400/x.svg');
+  });
+
   it('collapses equal dimensions to one segment', () => {
     expect(buildCatPath({ seed: 'x', width: 300, height: 300 })).toBe('/cat/300/x.svg');
   });
@@ -134,6 +170,12 @@ describe('renderCatRequest', () => {
     const svg = renderCatRequest(parse('/cat/1200x300/mackerel.svg?eyes=star'));
     expect(svg).toContain('width="1200"');
     expect(svg).toContain('height="300"');
+  });
+
+  it('renders the postcard fields a URL describes', () => {
+    const svg = renderCatRequest(parse('/cat/postcard/back/mackerel.svg?to=Sheehan&brand=off'));
+    expect(svg).toContain('>Sheehan</text>');
+    expect(svg.toLowerCase()).not.toContain('catsvg');
   });
 
   it('renders a postcard when the URL asks for one', () => {

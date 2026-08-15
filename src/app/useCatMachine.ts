@@ -4,7 +4,7 @@ import { POSTCARD_WIDTH, postcardHeightFor } from '../cat/postcard';
 import { buildCatPath, parseCatUrl } from '../cat/url';
 import { useLocalStorage } from './useLocalStorage';
 import type { PostcardSide } from '../cat/postcard';
-import type { CatMode } from '../cat/url';
+import type { CardFields, CatMode } from '../cat/url';
 import type { Locks, TraitKey, Traits } from '../cat/types';
 
 const LITTER_SIZE = 9;
@@ -29,6 +29,8 @@ export interface CatMachine {
   side: PostcardSide;
   /** Caption on a cat, greeting or message on a postcard. */
   text: string;
+  /** The rest of what a postcard says — addressee, signature, marks. */
+  card: CardFields;
   litter: Traits[];
   favourites: CatRecipe[];
   roll: (seed?: string) => void;
@@ -42,6 +44,8 @@ export interface CatMachine {
   setMode: (mode: CatMode) => void;
   setSide: (side: PostcardSide) => void;
   setText: (text: string) => void;
+  /** Patch one or more postcard fields, leaving the rest alone. */
+  setCard: (patch: CardFields) => void;
   saveFavourite: () => void;
   loadRecipe: (recipe: CatRecipe) => void;
   removeFavourite: (index: number) => void;
@@ -71,6 +75,12 @@ export function useCatMachine(): CatMachine {
   const [mode, setModeState] = useState<CatMode>(initial.mode);
   const [side, setSide] = useState<PostcardSide>(initial.side);
   const [text, setText] = useState(initial.text ?? '');
+  const [card, setCardState] = useState<CardFields>(initial.card);
+
+  const setCard = useCallback(
+    (patch: CardFields) => setCardState((prev) => ({ ...prev, ...patch })),
+    [],
+  );
   const [litterSeeds, setLitterSeeds] = useState<string[]>(() => seeds(LITTER_SIZE));
   const [favourites, setFavourites] = useLocalStorage<CatRecipe[]>(FAVOURITES_KEY, []);
 
@@ -160,7 +170,7 @@ export function useCatMachine(): CatMachine {
 
   // Keep the address bar shareable: the page URL always describes the cat.
   useEffect(() => {
-    const path = buildCatPath({ seed, locks, preset, width, height, mode, side, text });
+    const path = buildCatPath({ seed, locks, preset, width, height, mode, side, text, card });
     const query = path.slice(path.indexOf('?') === -1 ? path.length : path.indexOf('?'));
     const params = new URLSearchParams(query);
     params.set('seed', seed);
@@ -175,11 +185,11 @@ export function useCatMachine(): CatMachine {
       params.set('side', side);
     }
     window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
-  }, [seed, locks, preset, width, height, mode, side, text]);
+  }, [seed, locks, preset, width, height, mode, side, text, card]);
 
   return {
-    traits, seed, locks, preset, width, height, mode, side, text, litter, favourites,
+    traits, seed, locks, preset, width, height, mode, side, text, card, litter, favourites,
     roll, refreshLitter, keep, toggleLock, setTrait, clearLocks, setPreset,
-    setSize, setMode, setSide, setText, saveFavourite, loadRecipe, removeFavourite, recipe,
+    setSize, setMode, setSide, setText, setCard, saveFavourite, loadRecipe, removeFavourite, recipe,
   };
 }

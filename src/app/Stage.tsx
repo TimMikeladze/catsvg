@@ -17,7 +17,7 @@ export interface StageProps {
 
 /** The hero cat — or postcard — its name, and one lockable chip per trait. */
 export function Stage({ machine }: StageProps) {
-  const { traits, locks, mode, side, text, width, height } = machine;
+  const { traits, locks, mode, side, text, card, width, height } = machine;
   const onToggleLock = machine.toggleLock;
   // Twenty-odd chips push everything else off a phone screen, so they fold
   // away there and stay open in the wide column.
@@ -32,6 +32,7 @@ export function Stage({ machine }: StageProps) {
       <div className="artboard">
         {mode === 'postcard' ? (
           <PostcardSvg
+            {...card}
             traits={traits}
             width={STAGE_WIDTH}
             height={Math.round((STAGE_WIDTH * height) / width)}

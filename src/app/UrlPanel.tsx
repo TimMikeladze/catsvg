@@ -50,13 +50,13 @@ export interface UrlPanelProps {
 
 /** The placeholder-service surface: copyable image URLs, and a URL you can paste back in. */
 export function UrlPanel({ machine }: UrlPanelProps) {
-  const { seed, locks, preset, width, height, mode, side, text } = machine;
+  const { seed, locks, preset, width, height, mode, side, text, card } = machine;
   const [copied, setCopied] = useState<string | null>(null);
   const [pasted, setPasted] = useState('');
 
   const path = useMemo(
-    () => buildCatPath({ seed, locks, preset, width, height, mode, side, text }),
-    [seed, locks, preset, width, height, mode, side, text],
+    () => buildCatPath({ seed, locks, preset, width, height, mode, side, text, card }),
+    [seed, locks, preset, width, height, mode, side, text, card],
   );
   const sizes = mode === 'postcard' ? POSTCARD_PRESETS : SIZE_PRESETS;
   const url = origin() + path;
@@ -166,6 +166,7 @@ export function UrlPanel({ machine }: UrlPanelProps) {
             machine.setMode(pastedRequest.mode);
             machine.setSide(pastedRequest.side);
             machine.setText(pastedRequest.text ?? '');
+            machine.setCard(pastedRequest.card);
             // Last, so the size in the URL wins over the mode's default size.
             machine.setSize(pastedRequest.width, pastedRequest.height);
           }}

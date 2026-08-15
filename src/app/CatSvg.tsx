@@ -29,7 +29,21 @@ export interface PostcardSvgProps extends PostcardOptions {
 export const PostcardSvg = memo(function PostcardSvg({ traits, className, ...opts }: PostcardSvgProps) {
   const svg = useMemo(
     () => renderPostcard(traits, opts),
-    [traits, opts.width, opts.height, opts.side, opts.text],
+    // Every field the card can carry — miss one and the stage stops following
+    // the panel.
+    [
+      traits,
+      opts.width,
+      opts.height,
+      opts.side,
+      opts.text,
+      opts.caption,
+      opts.to,
+      opts.from,
+      opts.postmark,
+      opts.stamp,
+      opts.brand,
+    ],
   );
   return <span className={className} dangerouslySetInnerHTML={{ __html: svg }} />;
 });

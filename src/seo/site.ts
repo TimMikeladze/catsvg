@@ -84,6 +84,11 @@ export const PARAMS: Array<[string, string]> = [
   ['mode', 'cat (default) or postcard.'],
   ['side', 'front or back — the two sides of a postcard.'],
   ['text', 'Caption pill on a cat; the greeting or message on a postcard.'],
+  ['to, from', 'Addressee and signature on a postcard back.'],
+  ['caption', 'Small line under the greeting on a postcard front.'],
+  ['postmark', 'Words in the postmark ring.'],
+  ['stamp', 'How many stamps frank the back, 0–5. Default 1.'],
+  ['brand', 'brand=off drops every CatSVG mark.'],
   ['<trait>', 'Pin one trait: eyes=star, palette=neon, body=loaf, …'],
 ];
 
@@ -148,6 +153,10 @@ export const FAQ: Array<{ q: string; a: string }> = [
   {
     q: 'What is postcard mode?',
     a: 'Postcard mode mounts the same generated cat on a paper card. /cat/postcard/mackerel.svg is the picture side — the cat in a window with a greeting printed under it — and /cat/postcard/back/mackerel.svg is the written side, with a message, a stamp carrying a miniature of the same cat, a postmark and the address rules. Add ?text=… to write the greeting or the message yourself; leave it off and the cat writes its own.',
+  },
+  {
+    q: 'Can I put my own words on a postcard?',
+    a: 'Yes, every field on the card is a query parameter: ?text= is the greeting on the front and the message on the back, ?caption= is the small print under the greeting, ?to= and ?from= are the addressee and the signature, and ?postmark= sets the words in the postmark ring. Anything you leave out, the cat writes itself from the seed. ?stamp= sets how many stamps frank the back — none, one, or up to five in a row — and ?brand=off removes every CatSVG mark, which is what you want if you are printing the card for real.',
   },
   {
     q: 'Can I run CatSVG myself?',

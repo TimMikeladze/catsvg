@@ -59,6 +59,11 @@ suffix is optional.
 | `mode` | `cat` (default) or `postcard`. |
 | `side` | `front` or `back` — the two sides of a postcard. |
 | `text` | Caption pill on a cat; the greeting or message on a postcard. |
+| `caption` | Small line under the greeting, postcard front. |
+| `to`, `from` | Addressee and signature, postcard back. |
+| `postmark` | Words in the postmark ring, up to 12 characters. |
+| `stamp` | How many stamps frank the back, 0–5. Default 1. |
+| `brand` | `brand=off` drops every CatSVG mark. |
 | *any trait name* | Pin one trait: `?eyes=star&palette=neon&body=loaf` |
 
 Trait names are the 25 keys in `TRAIT_KEYS` (`palette`, `tone`, `body`, `size`,
@@ -85,13 +90,42 @@ signature.
 postcard with no size is 3:2 landscape (600×400) rather than square, and a
 single size segment keeps that ratio — `/cat/postcard/300/…` is 300×200.
 
-`?text=` writes the card: the greeting on the front, the message on the back.
-Leave it off and the cat writes its own — both are picked from the seed, so
-they never change for a given URL.
+#### Writing the card
+
+Every field on the card is a query parameter, and every one of them has an
+answer the cat writes itself from the seed — so a postcard is fully written
+whether you fill nothing in or all of it.
+
+| Field | Where it lands | Left empty |
+| --- | --- | --- |
+| `text` | The greeting (front) or the message (back) | The cat picks where it is writing from, or what it has to report |
+| `caption` | Small print under the greeting | Nothing |
+| `to` | The first address line | The cat's own name |
+| `from` | The signature | The cat's own name |
+| `postmark` | Inside the postmark ring | `CATSVG`, or the cat's place when unbranded |
 
 ```
-/cat/postcard/900x600/mackerel.svg?text=Greetings%20from%20Hull
-/cat/postcard/back/900x600/mackerel.svg?text=Send%20fish
+/cat/postcard/900x600/mackerel.svg?text=Greetings%20from%20Hull&caption=est.%202026
+/cat/postcard/back/900x600/mackerel.svg?text=Send%20fish&to=Sheehan&from=The%20Cat
+```
+
+#### Stamps and branding
+
+`?stamp=` is a count, not a switch: one stamp by default, up to five in a row,
+or none at all. They are right-aligned along the top of the address side and
+shrink to fit however many were asked for, and the postmark cancels the end of
+the row — so a full row gets it landed across the stamps the way a real one
+does. `?stamp=off` (or `0`) leaves the card unfranked and the address rules
+take the room back.
+
+`?brand=off` drops every CatSVG mark — the wordmark in the corner of the front,
+the footer on the back, and the `CATSVG` in the postmark, which becomes the
+place the cat is writing from instead. It reads `0`, `false`, `off` or `no`.
+
+```
+/cat/postcard/back/900x600/mackerel.svg?stamp=3          # a row of three
+/cat/postcard/back/900x600/mackerel.svg?stamp=off        # unfranked
+/cat/postcard/back/900x600/mackerel.svg?brand=off        # nothing says catsvg
 ```
 
 Everything else still applies: seeded postcards are pure functions of their URL,
@@ -117,8 +151,9 @@ edge to edge — nothing is cropped or letterboxed.
 `/` is the studio: roll cats, lock traits you like, pick a preset, type a seed,
 tinker with any single trait, save favourites (localStorage), and export SVG,
 PNG or a 3×3 contact sheet. The **Postcard** toggle turns whatever is on the
-stage into a card, flips between its two sides and lets you write the greeting;
-the exports and the URL follow it. The **Cat URL** panel gives you the image URL for
+stage into a card, flips between its two sides and lets you write every field
+on it — greeting, caption, addressee, signature, postmark, how many stamps, and
+whether the CatSVG marks are there at all. The exports and the URL follow it. The **Cat URL** panel gives you the image URL for
 whatever is on screen, an `<img>` snippet and a markdown snippet, plus a field
 where you can paste any cat URL back in to preview and load it.
 

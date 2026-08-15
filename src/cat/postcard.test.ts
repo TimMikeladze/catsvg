@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
+  MAX_STAMPS,
   POSTCARD_SIDES,
+  clampStamps,
   greetingFor,
+  markFor,
   noteFor,
+  placeFor,
   postcardHeightFor,
   renderPostcard,
   wrapText,
@@ -59,6 +63,9 @@ describe('renderPostcard', () => {
     expect(renderPostcard(traits, { side: 'back' })).toContain(noteFor('mackerel').slice(0, 20));
     expect(greetingFor('mackerel')).toBe(greetingFor('mackerel'));
     expect(greetingFor('mackerel')).toMatch(/^Greetings from /);
+    expect(greetingFor('mackerel')).toContain(placeFor('mackerel'));
+    expect(markFor('mackerel')).toBe(markFor('mackerel'));
+    expect(markFor('mackerel')).not.toMatch(/^THE /);
   });
 
   it('prints the text it is given instead', () => {
@@ -71,6 +78,64 @@ describe('renderPostcard', () => {
   it('signs and addresses the back with the cat’s name', () => {
     const back = renderPostcard(traits, { side: 'back' });
     expect(back).toContain(catName('mackerel'));
+  });
+
+  it('takes an addressee and a signature', () => {
+    const back = renderPostcard(traits, { side: 'back', to: 'Sheehan', from: 'The Cat' });
+    expect(back).toContain('>Sheehan</text>');
+    expect(back).toContain('— The Cat');
+    expect(back).not.toContain(catName('mackerel'));
+  });
+
+  it('prints a caption under the greeting on the front', () => {
+    const plain = renderPostcard(traits);
+    const withCaption = renderPostcard(traits, { caption: 'est. 2026' });
+    expect(plain).not.toContain('est. 2026');
+    expect(withCaption).toContain('est. 2026');
+    // The greeting is still there, and still the headline.
+    expect(withCaption).toContain(greetingFor('mackerel'));
+  });
+
+  it('drops the stamp and its postmark when asked', () => {
+    const franked = renderPostcard(traits, { side: 'back' });
+    const bare = renderPostcard(traits, { side: 'back', stamp: 0 });
+    expect(franked).toContain('1 CAT');
+    expect(bare).not.toContain('1 CAT');
+    expect(bare).not.toContain('CATSVG');
+    // The address rules stay — they just take the room the stamp had.
+    expect(bare).toContain(catName('mackerel'));
+  });
+
+  it('franks the back with as many stamps as asked for', () => {
+    for (const n of [0, 1, 2, 3, 5]) {
+      const svg = renderPostcard(traits, { side: 'back', stamp: n });
+      expect(svg.match(/1 CAT/g) ?? []).toHaveLength(n);
+      // However many, they stay on the card and one postmark cancels the row.
+      expect(svg).not.toContain('NaN');
+      expect(svg.match(/CATSVG<\/text>/g) ?? []).toHaveLength(n > 0 ? 1 : 0);
+    }
+  });
+
+  it('clamps a silly number of stamps', () => {
+    expect(clampStamps(99)).toBe(MAX_STAMPS);
+    expect(clampStamps(-3)).toBe(0);
+    expect(clampStamps(Number.NaN)).toBe(1);
+    expect(renderPostcard(traits, { side: 'back', stamp: 99 }).match(/1 CAT/g)).toHaveLength(MAX_STAMPS);
+  });
+
+  it('takes its own words for the postmark', () => {
+    expect(renderPostcard(traits, { side: 'back', postmark: 'Hull' })).toContain('>HULL</text>');
+  });
+
+  it('drops every CatSVG mark when branding is off', () => {
+    for (const side of POSTCARD_SIDES) {
+      const branded = renderPostcard(traits, { side });
+      const unbranded = renderPostcard(traits, { side, brand: false });
+      expect(branded.toLowerCase()).toContain('catsvg');
+      expect(unbranded.toLowerCase()).not.toContain('catsvg');
+    }
+    // The back still gets postmarked — with where the cat is, not who drew it.
+    expect(renderPostcard(traits, { side: 'back', brand: false })).toContain(markFor('mackerel'));
   });
 
   it('escapes text instead of emitting it as markup', () => {
@@ -110,7 +175,13 @@ describe('renderPostcard', () => {
     const sizes = [[600, 400], [400, 600], [400, 400], [2000, 250], [250, 2000], [16, 16], [2000, 2000]];
     for (const [w, h] of sizes) {
       for (const side of POSTCARD_SIDES) {
-        const svg = renderPostcard(makeTraits(`shape-${w}-${h}`), { width: w, height: h, side });
+        const svg = renderPostcard(makeTraits(`shape-${w}-${h}`), {
+          width: w,
+          height: h,
+          side,
+          caption: 'a caption long enough to need fitting',
+          to: 'Someone With A Long Name',
+        });
         expect(svg).not.toContain('NaN');
         expect(svg).not.toContain('undefined');
         expect(svg).toContain('</svg>');

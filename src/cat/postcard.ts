@@ -37,6 +37,59 @@ export interface PostcardOptions {
   side?: string;
   /** Greeting printed on the front, message written on the back. */
   text?: string;
+  /** Small line under the greeting, front only. */
+  caption?: string;
+  /** Addressee on the back. Defaults to the cat's own name. */
+  to?: string;
+  /** Signature on the back. Defaults to the cat's own name. */
+  from?: string;
+  /** Words in the postmark ring. Defaults to where the cat is writing from. */
+  postmark?: string;
+  /** How many stamps to frank the back with, 0–5. Default 1. */
+  stamp?: number;
+  /** CatSVG's own marks — the postmark wordmark and the footer. Default true. */
+  brand?: boolean;
+}
+
+/** Every field a card can carry, with the seed's own answers filled in. */
+interface Written {
+  text: string;
+  caption: string;
+  to: string;
+  from: string;
+  postmark: string;
+  stamp: number;
+  brand: boolean;
+}
+
+/** More than a row of five stops being postage and starts being wallpaper. */
+export const MAX_STAMPS = 5;
+
+export const clampStamps = (n: number): number =>
+  Math.min(MAX_STAMPS, Math.max(0, Math.round(Number.isFinite(n) ? n : 1)));
+
+/** How long each field is allowed to be before it stops fitting on paper. */
+const LIMITS = { text: 240, caption: 48, to: 40, from: 40, postmark: 12 } as const;
+
+const field = (value: string | undefined, fallback: string, limit: number): string => {
+  const written = (value ?? '').trim();
+  return (written || fallback).slice(0, limit);
+};
+
+/** Resolve what a card actually says, given what the URL asked for. */
+function written(t: Traits, side: PostcardSide, opts: PostcardOptions): Written {
+  const brand = opts.brand !== false;
+  const name = catName(t.seed);
+  return {
+    text: field(opts.text, side === 'front' ? greetingFor(t.seed) : noteFor(t.seed), LIMITS.text),
+    caption: (opts.caption ?? '').trim().slice(0, LIMITS.caption),
+    to: field(opts.to, name, LIMITS.to),
+    from: field(opts.from, name, LIMITS.from),
+    // Unbranded cards get postmarked where the cat is, not who drew it.
+    postmark: field(opts.postmark, brand ? 'CATSVG' : markFor(t.seed), LIMITS.postmark).toUpperCase(),
+    stamp: clampStamps(opts.stamp ?? 1),
+    brand,
+  };
 }
 
 /** Places a cat writes home from. */
@@ -59,9 +112,15 @@ const NOTES = [
   'Nothing to report. Sat down. Stood up. Sat down again. Marvellous.',
 ];
 
+/** Where a seed is writing from. */
+export const placeFor = (seed: string): string => pick(rng(seed + '|place'), PLACES);
+
 /** The greeting a seed prints on the front when the URL supplies none. */
-export const greetingFor = (seed: string): string =>
-  `Greetings from ${pick(rng(seed + '|place'), PLACES)}`;
+export const greetingFor = (seed: string): string => `Greetings from ${placeFor(seed)}`;
+
+/** The place as a postmark reads it: no article, upper case, ring-sized. */
+export const markFor = (seed: string): string =>
+  placeFor(seed).replace(/^the /i, '').toUpperCase().slice(0, LIMITS.postmark);
 
 /** The note a seed writes on the back when the URL supplies none. */
 export const noteFor = (seed: string): string => pick(rng(seed + '|note'), NOTES);
@@ -176,13 +235,15 @@ function stampG(t: Traits, box: Frame, paper: string, ink: string, ns: string): 
 }
 
 /** The postmark: rings, a dateline and the cancellation waves beside them. */
-function postmarkG(cx: number, cy: number, r: number, ink: string, tilt: number): string {
-  const fs = r * 0.32;
+function postmarkG(words: string, cx: number, cy: number, r: number, ink: string, tilt: number): string {
+  const label = escapeXml(words);
+  // Long words shrink to stay inside the ring rather than spilling out of it.
+  const fs = Math.min(r * 0.32, (r * 1.5) / Math.max(1, label.length * 0.62));
   const line = (y: number, w: number) =>
     `<path d="M${N(cx - w / 2)},${N(cy + y)} H${N(cx + w / 2)}" stroke="${ink}" stroke-width="${N(r * 0.05)}" opacity=".6"/>`;
   const text =
-    fs >= 4
-      ? `<text x="${N(cx)}" y="${N(cy + fs * 0.38)}" text-anchor="middle" font-family="${MONO}" font-weight="600" font-size="${N(fs)}" fill="${ink}" opacity=".72">CATSVG</text>`
+    fs >= 4 && label
+      ? `<text x="${N(cx)}" y="${N(cy + fs * 0.38)}" text-anchor="middle" font-family="${MONO}" font-weight="600" font-size="${N(fs)}" fill="${ink}" opacity=".72">${label}</text>`
       : '';
   let waves = '';
   for (let i = 0; i < 3; i++) {
@@ -206,27 +267,48 @@ function frontG(
   t: Traits,
   card: Frame,
   pad: number,
-  greeting: string,
+  w: Written,
   paper: string,
   ink: string,
   ns: string,
 ): string {
-  const capH = Math.max(6, card.h * 0.17);
+  // A caption under the greeting needs a taller strip to sit in.
+  const capH = Math.max(6, card.h * (w.caption ? 0.23 : 0.17));
   const win: Frame = {
     x: card.x + pad,
     y: card.y + pad,
     w: Math.max(1, card.w - 2 * pad),
     h: Math.max(1, card.h - 2 * pad - capH),
   };
-  const label = escapeXml(greeting.slice(0, 60));
+  const strip = win.y + win.h;
+  const label = escapeXml(w.text.slice(0, 60));
   // Fit the greeting to the strip: cap it by height, then shrink until the
   // longest greeting still clears the card's edges.
-  const fs = Math.max(3, Math.min(capH * 0.42, (win.w * 0.9) / (label.length * 0.6)));
+  const fs = Math.max(
+    3,
+    Math.min(capH * (w.caption ? 0.34 : 0.42), (win.w * 0.9) / (label.length * 0.6)),
+  );
+  const greeting = `<text x="${N(card.x + card.w / 2)}" y="${N(strip + capH * (w.caption ? 0.5 : 0.66))}" text-anchor="middle" font-family="${SANS}" font-weight="700" font-size="${N(fs)}" letter-spacing="${N(fs * 0.03)}" fill="${ink}">${label}</text>`;
+
+  let caption = '';
+  if (w.caption) {
+    const sub = escapeXml(w.caption);
+    const sfs = Math.max(3, Math.min(fs * 0.42, (win.w * 0.86) / (sub.length * 0.62)));
+    caption = `<text x="${N(card.x + card.w / 2)}" y="${N(strip + capH * 0.82)}" text-anchor="middle" font-family="${MONO}" font-size="${N(sfs)}" letter-spacing="${N(sfs * 0.12)}" fill="${ink}" opacity=".6">${sub}</text>`;
+  }
+
+  // The picture side carries the wordmark as small print in the corner.
+  const bfs = Math.max(3, pad * 0.5);
+  const mark = w.brand
+    ? `<text x="${N(card.x + card.w - pad * 0.6)}" y="${N(card.y + card.h - pad * 0.4)}" text-anchor="end" font-family="${MONO}" font-size="${N(bfs)}" letter-spacing="${N(bfs * 0.14)}" fill="${ink}" opacity=".35">CATSVG</text>`
+    : '';
 
   return (
     catWindow(t, win, ns, Math.min(win.w, win.h) * 0.02) +
     `<rect x="${N(win.x)}" y="${N(win.y)}" width="${N(win.w)}" height="${N(win.h)}" rx="${N(Math.min(win.w, win.h) * 0.02)}" fill="none" stroke="${ink}" stroke-width="${N(Math.max(0.5, pad * 0.14))}" opacity=".16"/>` +
-    `<text x="${N(card.x + card.w / 2)}" y="${N(win.y + win.h + capH * 0.66)}" text-anchor="middle" font-family="${SANS}" font-weight="700" font-size="${N(fs)}" letter-spacing="${N(fs * 0.03)}" fill="${ink}">${label}</text>` +
+    greeting +
+    caption +
+    mark +
     `<rect x="${N(card.x)}" y="${N(card.y)}" width="${N(card.w)}" height="${N(card.h)}" rx="${N(Math.min(card.w, card.h) * 0.03)}" fill="none" stroke="${mix(ink, paper, 0.5)}" stroke-width="${N(Math.max(0.5, pad * 0.1))}" opacity=".4"/>`
   );
 }
@@ -236,7 +318,7 @@ function backG(
   t: Traits,
   card: Frame,
   pad: number,
-  message: string,
+  w: Written,
   paper: string,
   ink: string,
   ns: string,
@@ -263,7 +345,7 @@ function backG(
   const fs = Math.max(3, Math.min(left.h * 0.09, left.w * 0.055));
   const lineH = Math.max(fs * 1.55, left.h / 13);
   const perLine = Math.max(8, Math.floor(left.w / (fs * 0.62)));
-  const lines = wrapText(message, perLine, Math.max(1, Math.floor((left.h * 0.62) / (fs * 1.6))));
+  const lines = wrapText(w.text, perLine, Math.max(1, Math.floor((left.h * 0.62) / (fs * 1.6))));
   // Wrapped text stays tightly set — it is one sentence, not one line per idea.
   const textH = fs * 1.6;
   let msg = '';
@@ -276,36 +358,60 @@ function backG(
   for (let y = left.y + usedH + lineH * 0.4; y < left.y + left.h - fs * 2.4; y += lineH) {
     scrawls += `<path d="${scrawl(r, left.x, y, left.w * rr(r, 0.55, 0.97), fs * 0.2)}" fill="none" stroke="${ink}" stroke-width="${N(fs * 0.11)}" stroke-linecap="round" opacity=".3"/>`;
   }
-  const sign = escapeXml(`— ${catName(t.seed)}`);
+  const sign = escapeXml(`— ${w.from}`);
   const sfs = Math.max(3, Math.min(fs, (left.w * 0.9) / (sign.length * 0.56)));
   const signature = `<text x="${N(left.x + left.w)}" y="${N(left.y + left.h - sfs * 0.4)}" text-anchor="end" font-family="${MONO}" font-style="italic" font-size="${N(sfs)}" fill="${ink}" opacity=".7">${sign}</text>`;
 
-  // Stamp, postmark, address.
-  const stampW = Math.min(right.w * 0.42, right.h * 0.4);
+  // Stamps run in a row along the top of the address side, right-aligned the
+  // way they are stuck on, and shrink to fit however many were asked for.
+  const count = w.stamp;
+  const gapRatio = 0.12;
+  const single = Math.min(right.w * 0.42, right.h * 0.4);
+  const fits = (right.w * 0.98) / Math.max(1, count + (count - 1) * gapRatio);
+  const stampW = Math.min(single, fits);
+  const stampGap = stampW * gapRatio;
   const stamp: Frame = {
     x: right.x + right.w - stampW,
     y: right.y,
     w: stampW,
     h: Math.min(stampW * 1.15, right.h * 0.46),
   };
-  const mark = postmarkG(
-    stamp.x - stampW * 0.34,
-    stamp.y + stamp.h * 0.42,
-    Math.max(2, stampW * 0.36),
-    ink,
-    rr(r, -14, 14),
-  );
+  const franked = count > 0 && stamp.w > 2 && stamp.h > 2;
+
+  let postage = '';
+  if (franked) {
+    let leftmost = stamp.x;
+    for (let i = 0; i < count; i++) {
+      // Right to left, so the row always ends flush with the panel edge.
+      const box: Frame = { ...stamp, x: stamp.x - i * (stampW + stampGap) };
+      leftmost = box.x;
+      postage += stampG(t, box, paper, ink, `${ns}s${i}`);
+    }
+    // One postmark, cancelling the end of the row. It keeps the size it would
+    // have beside a single stamp, and stays out of the message panel — so a
+    // full row gets it stamped over the stamps, the way a real one lands.
+    const markR = Math.max(2, single * 0.36);
+    postage += postmarkG(
+      w.postmark,
+      Math.max(right.x + markR, leftmost - stampW * 0.34),
+      stamp.y + stamp.h * 0.42,
+      markR,
+      ink,
+      rr(r, -14, 14),
+    );
+  }
 
   // An address is four or five lines wherever it lands — spread them over the
-  // space under the stamp rather than ruling the whole panel.
+  // space the stamp leaves, or the whole panel when there is no stamp.
   const afs = Math.max(3, Math.min(right.h * 0.075, right.w * 0.05));
-  const free = Math.max(afs, right.y + right.h - (stamp.y + stamp.h));
+  const top = franked ? stamp.y + stamp.h : right.y;
+  const free = Math.max(afs, right.y + right.h - top);
   const rules = 5;
   const step = Math.min(afs * 2.2, free / (rules + 1));
   // Centred in what the stamp leaves, so a tall card does not strand the
   // address at the top of an empty panel.
-  const addrTop = stamp.y + stamp.h + (free - (rules - 1) * step) / 2;
-  const to = escapeXml(catName(t.seed));
+  const addrTop = top + (free - (rules - 1) * step) / 2;
+  const to = escapeXml(w.to);
   let address = `<text x="${N(right.x)}" y="${N(addrTop - afs * 0.35)}" font-family="${MONO}" font-size="${N(afs)}" fill="${ink}" opacity=".8">${to}</text>`;
   for (let i = 0; i < rules; i++) {
     const y = addrTop + i * step;
@@ -316,15 +422,16 @@ function backG(
   }
 
   const ffs = Math.max(3, fs * 0.62);
-  const footer = `<text x="${N(inner.x)}" y="${N(card.y + card.h - pad * 0.35)}" font-family="${MONO}" font-size="${N(ffs)}" fill="${ink}" opacity=".4">catsvg · ${escapeXml(t.seed.slice(0, 24))}</text>`;
+  const footer = w.brand
+    ? `<text x="${N(inner.x)}" y="${N(card.y + card.h - pad * 0.35)}" font-family="${MONO}" font-size="${N(ffs)}" fill="${ink}" opacity=".4">catsvg · ${escapeXml(t.seed.slice(0, 24))}</text>`
+    : '';
 
   return (
     msg +
     scrawls +
     signature +
     `<path d="M${N(splitX)},${N(inner.y)} V${N(inner.y + inner.h)}" stroke="${ink}" stroke-width="${N(Math.max(0.5, pad * 0.1))}" opacity=".35"/>` +
-    (stamp.w > 2 && stamp.h > 2 ? stampG(t, stamp, paper, ink, ns) : '') +
-    mark +
+    postage +
     address +
     footer +
     `<rect x="${N(card.x)}" y="${N(card.y)}" width="${N(card.w)}" height="${N(card.h)}" rx="${N(Math.min(card.w, card.h) * 0.03)}" fill="none" stroke="${mix(ink, paper, 0.5)}" stroke-width="${N(Math.max(0.5, pad * 0.1))}" opacity=".4"/>`
@@ -335,17 +442,19 @@ function backG(
 export function describePostcard(
   t: Traits,
   side: PostcardSide,
-  text: string,
+  w: { text: string; to: string; from: string; stamp: number },
 ): { title: string; desc: string } {
-  const name = catName(t.seed);
   return {
-    title: `A postcard from ${name}`,
+    title: `A postcard from ${w.from}`,
     desc:
       side === 'front'
         ? `The picture side of a postcard: a geometric ${t.coat} cat in the ${t.palette} palette, ` +
-          `printed on a paper card under the words “${text}”. Generated from the seed “${t.seed}”.`
-        : `The written side of a postcard from ${name}, with a stamp showing the same cat, ` +
-          `a postmark, address rules and the message “${text}”. Generated from the seed “${t.seed}”.`,
+          `printed on a paper card under the words “${w.text}”. Generated from the seed “${t.seed}”.`
+        : `The written side of a postcard from ${w.from} to ${w.to}, ` +
+          (w.stamp > 0
+            ? `with ${w.stamp === 1 ? 'a stamp' : `${w.stamp} stamps`} showing the same cat, a postmark, `
+            : 'with ') +
+          `address rules and the message “${w.text}”. Generated from the seed “${t.seed}”.`,
   };
 }
 
@@ -373,16 +482,21 @@ export function renderPostcard(t: Traits, opts: PostcardOptions = {}): string {
   const rx = Math.min(card.w, card.h) * 0.03;
   const drop = m * 0.35;
 
-  const written = (opts.text ?? '').trim();
-  const text = written || (side === 'front' ? greetingFor(t.seed) : noteFor(t.seed));
-  const about = describePostcard(t, side, text);
-  const u = 'p' + hash(t.seed + side + text).toString(36);
+  const w = written(t, side, opts);
+  const about = describePostcard(t, side, w);
+  // Ids have to differ between any two cards that could share a page, so they
+  // hash everything that makes this card the card it is.
+  const u =
+    'p' +
+    hash(
+      [t.seed, side, w.text, w.caption, w.to, w.from, w.postmark, w.stamp, w.brand].join('|'),
+    ).toString(36);
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-labelledby="t${u} d${u}">
 <title id="t${u}">${escapeXml(about.title)}</title><desc id="d${u}">${escapeXml(about.desc)}</desc>
 <rect width="${width}" height="${height}" fill="${desk}"/>
 <rect x="${N(card.x + drop)}" y="${N(card.y + drop)}" width="${N(card.w)}" height="${N(card.h)}" rx="${N(rx)}" fill="#000000" opacity=".18"/>
 <rect x="${N(card.x)}" y="${N(card.y)}" width="${N(card.w)}" height="${N(card.h)}" rx="${N(rx)}" fill="${paper}"/>
-${side === 'front' ? frontG(t, card, pad, text, paper, ink, u) : backG(t, card, pad, text, paper, ink, u)}
+${side === 'front' ? frontG(t, card, pad, w, paper, ink, u) : backG(t, card, pad, w, paper, ink, u)}
 </svg>`;
 }

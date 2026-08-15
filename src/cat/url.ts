@@ -1,5 +1,11 @@
 import { renderCat } from './render';
-import { POSTCARD_WIDTH, isPostcardSide, postcardHeightFor, renderPostcard } from './postcard';
+import {
+  POSTCARD_WIDTH,
+  clampStamps,
+  isPostcardSide,
+  postcardHeightFor,
+  renderPostcard,
+} from './postcard';
 import { TRAIT_OPTIONS, isPresetName } from './spec';
 import { makeTraits, newSeed } from './traits';
 import { TRAIT_KEYS } from './types';
@@ -8,6 +14,47 @@ import type { Locks, TraitKey } from './types';
 
 /** What the URL asks to be drawn: a bare cat, or a cat on a postcard. */
 export type CatMode = 'cat' | 'postcard';
+
+/** The writable parts of a postcard, beyond its message. */
+export interface CardFields {
+  /** Small line under the greeting, front only. */
+  caption?: string;
+  /** Addressee on the back. */
+  to?: string;
+  /** Signature on the back. */
+  from?: string;
+  /** Words in the postmark ring. */
+  postmark?: string;
+  /** How many stamps frank the back. */
+  stamp?: number;
+  /** CatSVG's own marks. */
+  brand?: boolean;
+}
+
+/** Text fields a postcard URL can set, and how long each may be. */
+const CARD_TEXT = ['caption', 'to', 'from', 'postmark'] as const;
+
+const OFF = new Set(['0', 'false', 'off', 'no', 'none', 'hide']);
+const ON = new Set(['1', 'true', 'on', 'yes', 'show']);
+
+/** `?brand=off` and friends. Anything unreadable leaves the default alone. */
+const readFlag = (v: string | null): boolean | undefined => {
+  if (v === null) return undefined;
+  const s = v.trim().toLowerCase();
+  if (OFF.has(s)) return false;
+  if (ON.has(s) || s === '') return true;
+  return undefined;
+};
+
+/** `?stamp=3` is a count; `?stamp=off` is none of them. */
+const readCount = (v: string | null): number | undefined => {
+  if (v === null) return undefined;
+  const s = v.trim().toLowerCase();
+  if (OFF.has(s)) return 0;
+  if (ON.has(s) || s === '') return 1;
+  if (!/^\d+$/.test(s)) return undefined;
+  return clampStamps(Number(s));
+};
 
 /** Everything a cat URL can say. */
 export interface CatRequest {
@@ -21,6 +68,8 @@ export interface CatRequest {
   side: PostcardSide;
   /** Caption pill on a cat; the greeting or message on a postcard. */
   text?: string;
+  /** Postcard fields. Ignored outside postcard mode. */
+  card: CardFields;
   /** Trait overrides pinned by query string (`?eyes=star`). */
   locks: Locks;
   /** `?seed=random` — a different cat every request, so never cache it. */
@@ -124,6 +173,16 @@ export function parseCatUrl(url: URL): CatRequest {
   const preset = q.get('preset') ?? 'anything';
   const text = q.get('text') ?? undefined;
 
+  const card: CardFields = {};
+  for (const k of CARD_TEXT) {
+    const v = q.get(k);
+    if (v !== null && v.trim()) card[k] = v;
+  }
+  const brand = readFlag(q.get('brand'));
+  if (brand !== undefined) card.brand = brand;
+  const stamp = readCount(q.get('stamp'));
+  if (stamp !== undefined) card.stamp = stamp;
+
   return {
     seed: random ? newSeed() : seed!,
     width: w,
@@ -132,6 +191,7 @@ export function parseCatUrl(url: URL): CatRequest {
     mode,
     side,
     text: text ?? undefined,
+    card,
     locks,
     random,
   };
@@ -142,6 +202,7 @@ export function renderCatRequest(req: CatRequest): string {
   const traits = makeTraits(req.seed, req.locks, req.preset);
   if (req.mode === 'postcard')
     return renderPostcard(traits, {
+      ...req.card,
       width: req.width,
       height: req.height,
       side: req.side,
@@ -162,6 +223,7 @@ export interface BuildUrlInput {
   mode?: CatMode;
   side?: string;
   text?: string;
+  card?: CardFields;
   locks?: Locks;
 }
 
@@ -177,6 +239,16 @@ export function buildCatPath(input: BuildUrlInput): string {
   const q = new URLSearchParams();
   if (input.preset && input.preset !== 'anything') q.set('preset', input.preset);
   if (input.text) q.set('text', input.text);
+  if (postcard && input.card) {
+    for (const k of CARD_TEXT) {
+      const v = input.card[k];
+      if (v && v.trim()) q.set(k, v);
+    }
+    // Both default to on, so only a change is worth saying.
+    if (input.card.brand === false) q.set('brand', 'off');
+    const stamps = input.card.stamp;
+    if (stamps !== undefined && stamps !== 1) q.set('stamp', String(clampStamps(stamps)));
+  }
   for (const k of TRAIT_KEYS) {
     const v = input.locks?.[k];
     if (v) q.set(k, v);
