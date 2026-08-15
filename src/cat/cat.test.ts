@@ -4,6 +4,8 @@ import { catName, makeTraits } from './traits';
 import { SPEC, TRAIT_OPTIONS } from './spec';
 import { TRAIT_KEYS } from './types';
 import { mouthG } from './face';
+import { pawsG } from './accessories';
+import { BODIES } from './bodies';
 
 describe('makeTraits', () => {
   it('is deterministic for a seed', () => {
@@ -140,6 +142,15 @@ describe('facial construction', () => {
     const smirk = mouthG('smirk', 200, 190, '#111', '#f66', '#fff');
     expect(smirk).toContain('q-8,5 -14,-1');
     expect(smirk).toContain('q11,7 18,-4');
+  });
+});
+
+describe('paw construction', () => {
+  it('draws spread paws as one pair, never three paws', () => {
+    const paws = pawsG('spread', BODIES.sit, {
+      body: '#111', head: '#111', tail: '#111', mark: '#555', cream: '#fff', pop: '#f66',
+    });
+    expect(paws.match(/<rect/g)).toHaveLength(2);
   });
 });
 

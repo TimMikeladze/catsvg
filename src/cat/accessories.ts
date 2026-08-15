@@ -13,7 +13,7 @@ export function pawsG(k: string, body: Body, C: Colors): string {
     return `<rect x="${x - 42}" y="${y + 2}" width="46" height="17" rx="8.5" fill="${col}" transform="rotate(-8 ${x - 19} ${y + 10})"/><rect x="${x - 4}" y="${y}" width="46" height="17" rx="8.5" fill="${col}" transform="rotate(6 ${x + 19} ${y + 8})"/>`;
   if (k === 'tucked') return `<path d="M${x - 32},${y + 4} q32,-12 64,0 q-32,16 -64,0 Z" fill="${col}"/>`;
   if (k === 'spread')
-    return `<rect x="${x - gap * 2 - 17}" y="${y}" width="34" height="18" rx="9" fill="${col}"/><rect x="${x + gap * 2 - 17}" y="${y}" width="34" height="18" rx="9" fill="${col}"/><rect x="${x - 17}" y="${y + 2}" width="34" height="18" rx="9" fill="${col}"/>`;
+    return `<rect x="${x - gap * 2 - 17}" y="${y}" width="34" height="18" rx="9" fill="${col}"/><rect x="${x + gap * 2 - 17}" y="${y}" width="34" height="18" rx="9" fill="${col}"/>`;
   if (k === 'beans')
     return `<rect x="${x - gap - 15}" y="${y}" width="30" height="18" rx="9" fill="${col}"/><rect x="${x + gap - 15}" y="${y}" width="30" height="18" rx="9" fill="${col}"/>
     <circle cx="${x - gap}" cy="${y + 9}" r="4.5" fill="${C.pop}"/><circle cx="${x + gap}" cy="${y + 9}" r="4.5" fill="${C.pop}"/>`;
