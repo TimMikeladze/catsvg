@@ -1,6 +1,6 @@
-import { CatSvg } from './CatSvg.tsx';
-import { catName } from '../cat/traits.ts';
-import type { Traits } from '../cat/types.ts';
+import { CatSvg } from './CatSvg';
+import { catName } from '../cat/traits';
+import type { Traits } from '../cat/types';
 
 export interface LitterProps {
   litter: Traits[];

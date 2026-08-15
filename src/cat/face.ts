@@ -1,5 +1,5 @@
-import { N } from './rng.ts';
-import type { Colors } from './types.ts';
+import { N } from './rng';
+import type { Colors } from './types';
 
 export const EYES = [
   'almond', 'wedge', 'round', 'wide', 'sleepy', 'squint', 'slit', 'star',

@@ -1,4 +1,4 @@
-import type { Body, Colors } from './types.ts';
+import type { Body, Colors } from './types';
 
 export const BODIES: Record<string, Body> = {
   sit: { d: 'M150,238 C124,270 108,320 112,356 L288,356 C292,320 276,270 250,238 Z', hx: 200, hy: 168, hs: 1, tx: 288, ty: 344 },

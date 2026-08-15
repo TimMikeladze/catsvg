@@ -1,4 +1,4 @@
-import type { Colors, Palette } from './types.ts';
+import type { Colors, Palette } from './types';
 
 export const PAWS = ['none', 'two', 'crossed', 'tucked', 'spread', 'beans'] as const;
 

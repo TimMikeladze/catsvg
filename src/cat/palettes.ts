@@ -1,4 +1,4 @@
-import type { Palette } from './types.ts';
+import type { Palette } from './types';
 
 export const PALETTES: Record<string, Palette> = {
   bistro: { bg: '#7B6BE8', a: '#3A2B27', b: '#F2B233', c: '#F7F2E6', d: '#E4572E' },

@@ -1,6 +1,6 @@
-import { CatSvg } from './CatSvg.tsx';
-import { catName, makeTraits } from '../cat/traits.ts';
-import type { CatRecipe } from './useCatMachine.ts';
+import { CatSvg } from './CatSvg';
+import { catName, makeTraits } from '../cat/traits';
+import type { CatRecipe } from './useCatMachine';
 
 export interface FavouritesProps {
   favourites: CatRecipe[];

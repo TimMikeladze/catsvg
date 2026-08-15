@@ -1,4 +1,4 @@
-import type { Body, Colors } from './types.ts';
+import type { Body, Colors } from './types';
 
 type TailPath = (x: number, y: number) => string;
 

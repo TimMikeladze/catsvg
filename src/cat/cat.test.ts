@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { computeFrame, renderCat, renderSheet } from './render.ts';
-import { catName, makeTraits } from './traits.ts';
-import { SPEC, TRAIT_OPTIONS } from './spec.ts';
-import { TRAIT_KEYS } from './types.ts';
+import { computeFrame, renderCat, renderSheet } from './render';
+import { catName, makeTraits } from './traits';
+import { SPEC, TRAIT_OPTIONS } from './spec';
+import { TRAIT_KEYS } from './types';
 
 describe('makeTraits', () => {
   it('is deterministic for a seed', () => {

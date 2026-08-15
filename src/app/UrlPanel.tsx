@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
-import { buildCatPath, parseCatUrl } from '../cat/url.ts';
-import { catName } from '../cat/traits.ts';
-import { copyText } from './download.ts';
-import type { CatMachine } from './useCatMachine.ts';
+import { buildCatPath, parseCatUrl } from '../cat/url';
+import { catName } from '../cat/traits';
+import { copyText } from './download';
+import type { CatMachine } from './useCatMachine';
 
 const SIZE_PRESETS: Array<[number, number]> = [
   [400, 400],

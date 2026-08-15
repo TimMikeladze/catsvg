@@ -1,8 +1,8 @@
-import { renderCat } from './render.ts';
-import { TRAIT_OPTIONS, isPresetName } from './spec.ts';
-import { makeTraits, newSeed } from './traits.ts';
-import { TRAIT_KEYS } from './types.ts';
-import type { Locks, TraitKey } from './types.ts';
+import { renderCat } from './render';
+import { TRAIT_OPTIONS, isPresetName } from './spec';
+import { makeTraits, newSeed } from './traits';
+import { TRAIT_KEYS } from './types';
+import type { Locks, TraitKey } from './types';
 
 /** Everything a cat URL can say. */
 export interface CatRequest {

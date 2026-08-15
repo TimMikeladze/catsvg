@@ -1,5 +1,5 @@
-import { N, rr } from './rng.ts';
-import type { Colors, Rng } from './types.ts';
+import { N, rr } from './rng';
+import type { Colors, Rng } from './types';
 
 export const COATS = [
   'solid', 'stripes', 'patch', 'bib', 'socks', 'tuxedo', 'spots', 'saddle',

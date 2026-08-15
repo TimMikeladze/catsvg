@@ -1,4 +1,4 @@
-import type { Colors } from './types.ts';
+import type { Colors } from './types';
 
 export const EARS = ['pointy', 'tall', 'round', 'wide', 'tufted', 'folded', 'notched', 'satellite', 'curled'] as const;
 

@@ -1,13 +1,13 @@
-import { BODIES, FLUFF, POSTURES, SIZES } from './bodies.ts';
-import { COATS } from './coats.ts';
-import { EARS, HEADS } from './heads.ts';
-import { EYES, FACES, LASHES, MOUTHS, NOSES, WHISKERS } from './face.ts';
-import { AURAS, EXTRAS, HOLDS, PAWS, PROPS } from './accessories.ts';
-import { PALETTES } from './palettes.ts';
-import { FRAMES, SCENES, TINTS, TONES } from './scenes.ts';
-import { TAILS, TAILTIPS } from './tails.ts';
-import { TRAIT_KEYS } from './types.ts';
-import type { TraitKey, Traits } from './types.ts';
+import { BODIES, FLUFF, POSTURES, SIZES } from './bodies';
+import { COATS } from './coats';
+import { EARS, HEADS } from './heads';
+import { EYES, FACES, LASHES, MOUTHS, NOSES, WHISKERS } from './face';
+import { AURAS, EXTRAS, HOLDS, PAWS, PROPS } from './accessories';
+import { PALETTES } from './palettes';
+import { FRAMES, SCENES, TINTS, TONES } from './scenes';
+import { TAILS, TAILTIPS } from './tails';
+import { TRAIT_KEYS } from './types';
+import type { TraitKey, Traits } from './types';
 
 /**
  * Every trait's option pool. Duplicated entries are deliberate weighting —

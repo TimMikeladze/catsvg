@@ -1,13 +1,13 @@
-import { BODIES, POSTURES, SIZES, fluffG } from './bodies.ts';
-import { PALETTES } from './palettes.ts';
-import { auraG, extraG, holdG, pawsG, propG } from './accessories.ts';
-import { coatG } from './coats.ts';
-import { earExtras, headPath, HEADS } from './heads.ts';
-import { eyesG, faceG, lashesG, mouthG, noseG, whiskersG } from './face.ts';
-import { frameG, sceneG, tintG, toneOf } from './scenes.ts';
-import { tailLayer } from './tails.ts';
-import { N, hash, mix, rng } from './rng.ts';
-import type { Frame, Traits } from './types.ts';
+import { BODIES, POSTURES, SIZES, fluffG } from './bodies';
+import { PALETTES } from './palettes';
+import { auraG, extraG, holdG, pawsG, propG } from './accessories';
+import { coatG } from './coats';
+import { earExtras, headPath, HEADS } from './heads';
+import { eyesG, faceG, lashesG, mouthG, noseG, whiskersG } from './face';
+import { frameG, sceneG, tintG, toneOf } from './scenes';
+import { tailLayer } from './tails';
+import { N, hash, mix, rng } from './rng';
+import type { Frame, Traits } from './types';
 
 /** The square the cat itself is drawn in. Everything else stretches around it. */
 export const ART = 400;

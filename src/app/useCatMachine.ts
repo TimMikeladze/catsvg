@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { makeTraits, newSeed } from '../cat/traits.ts';
-import { buildCatPath, parseCatUrl } from '../cat/url.ts';
-import { useLocalStorage } from './useLocalStorage.ts';
-import type { Locks, TraitKey, Traits } from '../cat/types.ts';
+import { makeTraits, newSeed } from '../cat/traits';
+import { buildCatPath, parseCatUrl } from '../cat/url';
+import { useLocalStorage } from './useLocalStorage';
+import type { Locks, TraitKey, Traits } from '../cat/types';
 
 const LITTER_SIZE = 9;
 const MAX_FAVOURITES = 16;

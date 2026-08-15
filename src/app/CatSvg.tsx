@@ -1,7 +1,7 @@
 import { memo, useMemo } from 'react';
-import { renderCat } from '../cat/render.ts';
-import type { RenderOptions } from '../cat/render.ts';
-import type { Traits } from '../cat/types.ts';
+import { renderCat } from '../cat/render';
+import type { RenderOptions } from '../cat/render';
+import type { Traits } from '../cat/types';
 
 export interface CatSvgProps extends RenderOptions {
   traits: Traits;

@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
-import { ApiDocs } from './ApiDocs.tsx';
-import { Controls } from './Controls.tsx';
-import { Favourites } from './Favourites.tsx';
-import { Footer, GITHUB_URL } from './Footer.tsx';
-import { Litter } from './Litter.tsx';
-import { Stage } from './Stage.tsx';
-import { UrlPanel } from './UrlPanel.tsx';
-import { COMBOS } from '../cat/spec.ts';
-import { useCatMachine } from './useCatMachine.ts';
+import { ApiDocs } from './ApiDocs';
+import { Controls } from './Controls';
+import { Favourites } from './Favourites';
+import { Footer, GITHUB_URL } from './Footer';
+import { Litter } from './Litter';
+import { Stage } from './Stage';
+import { UrlPanel } from './UrlPanel';
+import { COMBOS } from '../cat/spec';
+import { useCatMachine } from './useCatMachine';
 
 const TYPING = /^(INPUT|SELECT|TEXTAREA)$/;
 

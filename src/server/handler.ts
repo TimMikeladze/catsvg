@@ -1,4 +1,4 @@
-import { parseCatUrl, renderCatRequest } from '../cat/url.ts';
+import { parseCatUrl, renderCatRequest } from '../cat/url';
 
 export interface SvgResponse {
   status: number;

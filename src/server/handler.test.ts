@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { handleCatRequest, normalizeCatUrl } from './handler.ts';
+import { handleCatRequest, normalizeCatUrl } from './handler';
 
 const get = (path: string) => handleCatRequest(new URL(path, 'https://cats.test'));
 

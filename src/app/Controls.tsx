@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { PRESET_NAMES, TRAIT_OPTIONS } from '../cat/spec.ts';
-import { renderCat, renderSheet } from '../cat/render.ts';
-import { makeTraits, newSeed } from '../cat/traits.ts';
-import { copyText, downloadPng, downloadSvg } from './download.ts';
-import { TRAIT_KEYS } from '../cat/types.ts';
-import type { TraitKey } from '../cat/types.ts';
-import type { CatMachine } from './useCatMachine.ts';
+import { PRESET_NAMES, TRAIT_OPTIONS } from '../cat/spec';
+import { renderCat, renderSheet } from '../cat/render';
+import { makeTraits, newSeed } from '../cat/traits';
+import { copyText, downloadPng, downloadSvg } from './download';
+import { TRAIT_KEYS } from '../cat/types';
+import type { TraitKey } from '../cat/types';
+import type { CatMachine } from './useCatMachine';
 
 const SHEET_CELLS = 9;
 

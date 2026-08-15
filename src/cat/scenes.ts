@@ -1,5 +1,5 @@
-import { N, mix, rr } from './rng.ts';
-import type { Colors, Frame, Palette, Rng } from './types.ts';
+import { N, mix, rr } from './rng';
+import type { Colors, Frame, Palette, Rng } from './types';
 
 /**
  * Backgrounds, tints and frames all paint the whole visible {@link Frame}, not

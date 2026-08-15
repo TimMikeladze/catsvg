@@ -1,4 +1,4 @@
-import type { Rng } from './types.ts';
+import type { Rng } from './types';
 
 /** FNV-1a. Stable across runtimes — the seed contract depends on it. */
 export function hash(s: string): number {

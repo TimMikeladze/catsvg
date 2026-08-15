@@ -1,7 +1,7 @@
-import { CatSvg } from './CatSvg.tsx';
-import { TRAIT_LABEL } from '../cat/spec.ts';
-import { catName } from '../cat/traits.ts';
-import type { Locks, TraitKey, Traits } from '../cat/types.ts';
+import { CatSvg } from './CatSvg';
+import { TRAIT_LABEL } from '../cat/spec';
+import { catName } from '../cat/traits';
+import type { Locks, TraitKey, Traits } from '../cat/types';
 
 const CHIP_ORDER = Object.keys(TRAIT_LABEL) as TraitKey[];
 

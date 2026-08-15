@@ -1,4 +1,4 @@
-import { handleCatRequest } from '../src/server/handler.ts';
+import { handleCatRequest } from '../src/server/handler';
 
 export const config = { runtime: 'edge' };
 

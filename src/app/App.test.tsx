@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { App } from './App.tsx';
+import { App } from './App';
 
 const seedLine = () => screen.getByText(/^seed · /, { selector: '.seedline' }).textContent ?? '';
 
@@ -31,7 +31,7 @@ describe('App', () => {
   it('renders the exact cat a typed seed asks for', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.type(screen.getByLabelText('Seed word'), 'mackerel');
+    fireEvent.change(screen.getByLabelText('Seed word'), { target: { value: 'mackerel' } });
     await user.click(screen.getByRole('button', { name: 'Go' }));
     expect(seedLine()).toBe('seed · mackerel');
   });
@@ -50,7 +50,7 @@ describe('App', () => {
   it('puts the current cat in a copyable image URL', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.type(screen.getByLabelText('Seed word'), 'biscuit');
+    fireEvent.change(screen.getByLabelText('Seed word'), { target: { value: 'biscuit' } });
     await user.click(screen.getByRole('button', { name: 'Go' }));
     const url = screen.getByLabelText('Cat image URL') as HTMLInputElement;
     expect(url.value).toContain('/cat/400/biscuit.svg');
@@ -66,7 +66,7 @@ describe('App', () => {
   it('loads a pasted cat URL', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.type(screen.getByLabelText('Paste a cat URL'), '/cat/800x450/pickle.svg?eyes=star');
+    fireEvent.change(screen.getByLabelText('Paste a cat URL'), { target: { value: '/cat/800x450/pickle.svg?eyes=star' } });
     expect(screen.getByText('pickle', { selector: 'strong' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Load' }));
     expect(seedLine()).toBe('seed · pickle');
@@ -78,14 +78,14 @@ describe('App', () => {
   it('rejects a URL it cannot read', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.type(screen.getByLabelText('Paste a cat URL'), 'http://');
+    fireEvent.change(screen.getByLabelText('Paste a cat URL'), { target: { value: 'http://' } });
     expect(screen.getByText('Not a URL this service understands.')).toBeInTheDocument();
   });
 
   it('saves and reloads a favourite', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.type(screen.getByLabelText('Seed word'), 'domino');
+    fireEvent.change(screen.getByLabelText('Seed word'), { target: { value: 'domino' } });
     await user.click(screen.getByRole('button', { name: 'Go' }));
     await user.click(screen.getByRole('button', { name: 'Save to favourites' }));
     await user.click(screen.getByRole('button', { name: /New cat/ }));

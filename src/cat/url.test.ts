@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE, buildCatPath, parseCatUrl, renderCatRequest } from './url.ts';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE, buildCatPath, parseCatUrl, renderCatRequest } from './url';
 
 const parse = (path: string) => parseCatUrl(new URL(path, 'https://cats.test'));
 

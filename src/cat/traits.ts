@@ -1,10 +1,10 @@
-import { BODIES } from './bodies.ts';
-import { NECK } from './accessories.ts';
-import { N, pick, rng, rr } from './rng.ts';
-import { PRESETS, SPEC, isPresetName } from './spec.ts';
-import { TRAIT_KEYS } from './types.ts';
-import type { PresetName } from './spec.ts';
-import type { Locks, Traits } from './types.ts';
+import { BODIES } from './bodies';
+import { NECK } from './accessories';
+import { N, pick, rng, rr } from './rng';
+import { PRESETS, SPEC, isPresetName } from './spec';
+import { TRAIT_KEYS } from './types';
+import type { PresetName } from './spec';
+import type { Locks, Traits } from './types';
 
 export type { PresetName };
 

@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import type { Connect, Plugin } from 'vite';
-import { handleCatRequest } from './src/server/handler.ts';
+import { handleCatRequest } from './src/server/handler';
 
 /** URL prefixes handled by the image API rather than the SPA. */
 const API_PREFIXES = new Set(['cat', 'cats', 'i']);
