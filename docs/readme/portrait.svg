@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -133.3 400 533.3" width="600" height="800" role="img" aria-labelledby="tcox3gxi dcox3gxi">
+<title id="tcox3gxi">Tangerine the Small — a cat placeholder image</title><desc id="dcox3gxi">A geometric starchest cat in the moss palette, sitting in a rings scene with round eyes, curled ears and a up tail. Generated from the seed “pebble”.</desc>
+<defs>
+<clipPath id="bcox3gxi"><path d="M90,322 C92,286 136,268 204,270 C272,272 310,292 310,326 L308,356 L92,356 Z"/></clipPath>
+<clipPath id="hcox3gxi"><path d="M98,231 C96,199 99,156 126,154
+      C126,151 135,155 144,159
+      C162,153 186,153 204,159
+      C213,155 222,151 222,154
+      C249,156 252,199 250,231
+      C249,270 222,294 174,296
+      C126,294 99,270 98,231 Z"/></clipPath>
+<clipPath id="fcox3gxi"><rect x="0" y="-133.3" width="400" height="533.3" rx="14"/></clipPath>
+</defs>
+<g clip-path="url(#fcox3gxi)">
+<rect x="0" y="-133.3" width="400" height="533.3" fill="#C7D2AC"/><circle cx="200" cy="210" r="38" fill="none" stroke="#F4F1E0" stroke-width="6" opacity=".12"/><circle cx="200" cy="210" r="76" fill="none" stroke="#F4F1E0" stroke-width="6" opacity=".12"/><circle cx="200" cy="210" r="114" fill="none" stroke="#F4F1E0" stroke-width="6" opacity=".12"/><circle cx="200" cy="210" r="152" fill="none" stroke="#F4F1E0" stroke-width="6" opacity=".12"/><circle cx="200" cy="210" r="190" fill="none" stroke="#F4F1E0" stroke-width="6" opacity=".12"/><circle cx="200" cy="210" r="228" fill="none" stroke="#F4F1E0" stroke-width="6" opacity=".12"/><circle cx="200" cy="210" r="266" fill="none" stroke="#F4F1E0" stroke-width="6" opacity=".12"/><circle cx="200" cy="210" r="304" fill="none" stroke="#F4F1E0" stroke-width="6" opacity=".12"/><circle cx="200" cy="210" r="342" fill="none" stroke="#F4F1E0" stroke-width="6" opacity=".12"/>
+<ellipse cx="200" cy="362" rx="146" ry="14" fill="#3E5233" opacity=".16"/>
+<g transform="translate(200,368) scale(1) rotate(6) translate(-200,-368)">
+<g><path d="M304,334 C354,338 374,288 366,234" fill="none" stroke="#8AA05A" stroke-width="24" stroke-linecap="round"/><path d="M304,334 C354,338 374,288 366,234" pathLength="100" fill="none" stroke="#8AA05A" stroke-width="42" stroke-linecap="round" stroke-dasharray="9 100" stroke-dashoffset="-91"/></g>
+
+<path d="M90,322 C92,286 136,268 204,270 C272,272 310,292 310,326 L308,356 L92,356 Z" fill="#8AA05A"/>
+<g clip-path="url(#bcox3gxi)"><path d="M200,262 l9,20 22,2 -16,15 5,22 -20,-11 -20,11 5,-22 -16,-15 22,-2 Z" fill="#F4F1E0"/></g>
+
+<g><ellipse cx="150" cy="319" rx="18" ry="11" fill="#F4F1E0" transform="rotate(18 150 319)"/><ellipse cx="198" cy="319" rx="18" ry="11" fill="#F4F1E0" transform="rotate(-18 198 319)"/><g transform="translate(174,312) scale(.94) translate(-174,-312)"><rect x="154" y="296" width="40" height="34" rx="6" fill="#F4F1E0" stroke="#3E5233" stroke-width="2"/><path d="M194,306 a10,10 0 0,1 0,16" fill="none" stroke="#3E5233" stroke-width="4"/><rect x="154" y="296" width="40" height="9" fill="#D96C3F"/></g></g>
+<g transform="translate(174,224) scale(1.1,0.9) translate(-174,-224)">
+  <path d="M98,231 C96,199 99,156 126,154
+      C126,151 135,155 144,159
+      C162,153 186,153 204,159
+      C213,155 222,151 222,154
+      C249,156 252,199 250,231
+      C249,270 222,294 174,296
+      C126,294 99,270 98,231 Z" fill="#8AA05A"/>
+  <g clip-path="url(#hcox3gxi)"><path d="M161,112 L187,112 L181,232 L167,232 Z" fill="#F4F1E0"/></g>
+  <path d="M105,159 c-4,-22 25,-25 25,-5 c0,9 -8,12 -14,7" fill="none" stroke="#D96C3F" stroke-width="5" stroke-linecap="round"/>
+      <path d="M243,159 c4,-22 -25,-25 -25,-5 c0,9 8,12 14,7" fill="none" stroke="#D96C3F" stroke-width="5" stroke-linecap="round"/>
+  <g stroke="#F4F1E0" stroke-width="2.6" stroke-linecap="round" fill="none" opacity=".8"><path d="M196,256 L256,246"/><path d="M196,261 L254,268"/><path d="M196,265 L248,282"/></g>
+  <g><circle cx="144" cy="220" r="12" fill="#F4F1E0"/><circle cx="146" cy="220" r="5" fill="#3e4828"/><circle cx="204" cy="220" r="12" fill="#F4F1E0"/><circle cx="206" cy="220" r="5" fill="#3e4828"/></g>
+  
+  <path d="M162,246 L186,246 L174,257 Z" fill="#D96C3F"/>
+  <path d="M174,256 v6 M174,262 q-9,7 -15,-1 M174,262 q9,7 15,-1" stroke="#3e4828" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M165,264 l5,0 -2.5,9 Z" fill="#F4F1E0"/><path d="M178,264 l5,0 -2.5,9 Z" fill="#F4F1E0"/>
+  <path d="M122,166 L134,120 L156,148 L174,112 L192,148 L214,120 L226,166 Z" fill="#8AA05A" stroke="#3E5233" stroke-width="2"/><circle cx="174" cy="152" r="6" fill="#D96C3F"/>
+</g>
+<g></g>
+</g>
+<path d="M46,358 l4,-24 h24 l4,24 Z" fill="#D96C3F"/><path d="M62,334 q-26,-6 -22,-34 q24,4 22,34 Z" fill="#8AA05A"/><path d="M62,334 q26,-10 24,-38 q-26,8 -24,38 Z" fill="#8AA05A" opacity=".8"/>
+
+<rect x="16" y="-117.3" width="368" height="501.3" rx="12" fill="none" stroke="#F4F1E0" stroke-width="4" stroke-dasharray="14 10" opacity=".65"/>
+
+</g>
+</svg>
