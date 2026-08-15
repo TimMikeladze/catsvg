@@ -75,8 +75,7 @@ describe('App', () => {
     expect(url).toContain('eyes=star');
   });
 
-  it('rejects a URL it cannot read', async () => {
-    const user = userEvent.setup();
+  it('rejects a URL it cannot read', () => {
     render(<App />);
     fireEvent.change(screen.getByLabelText('Paste a cat URL'), { target: { value: 'http://' } });
     expect(screen.getByText('Not a URL this service understands.')).toBeInTheDocument();
