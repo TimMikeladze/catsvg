@@ -88,12 +88,13 @@ describe('App', () => {
     expect(screen.getByText('Not a URL this service understands.')).toBeInTheDocument();
   });
 
-  it('keeps the tinker panel open on a wide screen and folded on a narrow one', () => {
+  it('keeps the trait and tinker panels open on a wide screen and folded on a narrow one', () => {
     const real = window.matchMedia;
-    const fold = () => document.querySelector('.fold') as HTMLDetailsElement;
+    const folds = () => [...document.querySelectorAll('.fold')] as HTMLDetailsElement[];
+    const openState = () => folds().map((f) => f.open);
 
     render(<App />);
-    expect(fold().open).toBe(true);
+    expect(openState()).toEqual([true, true]);
 
     window.matchMedia = ((query: string) => ({
       matches: query.includes('900px'),
@@ -104,7 +105,8 @@ describe('App', () => {
     try {
       document.body.innerHTML = '';
       render(<App />);
-      expect(fold().open).toBe(false);
+      expect(openState()).toEqual([false, false]);
+      expect(screen.getByText('Traits')).toBeInTheDocument();
       expect(screen.getByText('Tinker')).toBeInTheDocument();
     } finally {
       window.matchMedia = real;
