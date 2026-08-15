@@ -72,6 +72,74 @@ describe('App', () => {
     expect((screen.getByLabelText('Cat image URL') as HTMLInputElement).value).toContain('/cat/1200x300/');
   });
 
+  // These drive a lot of buttons, and every click re-renders a whole postcard,
+  // so they use fireEvent rather than paying for simulated pointer events.
+  const press = (name: string) => fireEvent.click(screen.getByRole('button', { name }));
+  const url = () => (screen.getByLabelText('Cat image URL') as HTMLInputElement).value;
+  const stage = () => document.querySelector('.stage svg');
+
+  it('turns the cat into a postcard and back', () => {
+    render(<App />);
+    fireEvent.change(screen.getByLabelText('Seed word'), { target: { value: 'mackerel' } });
+    press('Go');
+
+    press('Postcard');
+    // A postcard defaults to a card shape rather than the cat's square.
+    expect(url()).toContain('/cat/postcard/600x400/mackerel.svg');
+    expect(stage()?.getAttribute('viewBox')).toBe('0 0 400 267');
+
+    press('Back');
+    expect(url()).toContain('/cat/postcard/back/600x400/mackerel.svg');
+
+    press('Plain cat');
+    expect(url()).toContain('/cat/400/mackerel.svg');
+  });
+
+  it('writes the greeting on the postcard and into the URL', () => {
+    render(<App />);
+    press('Postcard');
+    fireEvent.change(screen.getByLabelText('Greeting'), { target: { value: 'Greetings from Hull' } });
+    expect(stage()?.innerHTML).toContain('Greetings from Hull');
+    expect(url()).toContain('text=Greetings+from+Hull');
+  });
+
+  it('writes the addressee and the signature into the card and the URL', () => {
+    render(<App />);
+    press('Postcard');
+    press('Back');
+
+    fireEvent.change(screen.getByLabelText('Addressed to'), { target: { value: 'Sheehan' } });
+    fireEvent.change(screen.getByLabelText('Signed by'), { target: { value: 'The Cat' } });
+    expect(stage()?.innerHTML).toContain('Sheehan');
+    expect(stage()?.innerHTML).toContain('The Cat');
+    expect(url()).toContain('to=Sheehan');
+    expect(url()).toContain('from=The+Cat');
+  });
+
+  it('takes the CatSVG marks off the card', () => {
+    render(<App />);
+    press('Postcard');
+    press('Back');
+    press('CatSVG mark');
+    expect(url()).toContain('brand=off');
+    expect(stage()?.innerHTML.toLowerCase()).not.toContain('catsvg');
+  });
+
+  it('franks the card with as many stamps as asked for', () => {
+    render(<App />);
+    press('Postcard');
+    press('Back');
+
+    press('No stamps');
+    expect(url()).toContain('stamp=0');
+    expect(stage()?.innerHTML).not.toContain('1 CAT');
+
+    // A row of three, because a cat can be extravagant about postage.
+    press('3 stamps');
+    expect(url()).toContain('stamp=3');
+    expect(stage()?.innerHTML.match(/1 CAT/g)).toHaveLength(3);
+  });
+
   it('loads a pasted cat URL', async () => {
     const user = userEvent.setup();
     render(<App />);

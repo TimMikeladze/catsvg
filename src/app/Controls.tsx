@@ -2,12 +2,16 @@ import { useEffect, useState } from 'react';
 import { NARROW, useMediaQuery } from './useMediaQuery';
 import { PRESET_NAMES, TRAIT_OPTIONS } from '../cat/spec';
 import { renderCat, renderSheet } from '../cat/render';
-import { makeTraits, newSeed } from '../cat/traits';
+import { greetingFor, markFor, noteFor, renderPostcard } from '../cat/postcard';
+import { catName, makeTraits, newSeed } from '../cat/traits';
 import { copyText, downloadPng, downloadSvg } from './download';
 import type { TraitKey } from '../cat/types';
 import type { CatMachine } from './useCatMachine';
 
 const SHEET_CELLS = 9;
+
+/** How many stamps the studio offers; the URL takes up to MAX_STAMPS. */
+const STAMP_COUNTS = [0, 1, 2, 3];
 
 const TINKER_GROUPS: Array<{ label: string; keys: TraitKey[] }> = [
   { label: 'Silhouette', keys: ['body', 'size', 'posture', 'fluff', 'tail', 'tailtip', 'paws'] },
@@ -49,7 +53,10 @@ export interface ControlsProps {
 
 /** Roll / export / preset / seed / per-trait tinkering. */
 export function Controls({ machine }: ControlsProps) {
-  const { traits, locks, preset, width, height } = machine;
+  const { traits, locks, preset, width, height, mode, side, text, card } = machine;
+  const postcard = mode === 'postcard';
+  const stamps = card.stamp ?? 1;
+  const branded = card.brand !== false;
   const [seedDraft, setSeedDraft] = useState('');
   const [copyLabel, setCopyLabel] = useState('Copy SVG code');
 
@@ -60,7 +67,12 @@ export function Controls({ machine }: ControlsProps) {
   useEffect(() => setTinkerOpen(!narrow), [narrow]);
   const lockCount = Object.keys(locks).length;
 
-  const currentSvg = () => renderCat(traits, { width, height });
+  // Every export follows whatever is on the stage, postcard included.
+  const currentSvg = () =>
+    postcard
+      ? renderPostcard(traits, { ...card, width, height, side, text })
+      : renderCat(traits, { width, height });
+  const fileStem = postcard ? `postcard-${side}-${traits.seed}` : `cat-${traits.seed}`;
 
   const onCopy = async () => {
     const ok = await copyText(currentSvg());
@@ -96,7 +108,7 @@ export function Controls({ machine }: ControlsProps) {
         <button
           type="button"
           className="ghost sm"
-          onClick={() => downloadSvg(`cat-${traits.seed}.svg`, currentSvg())}
+          onClick={() => downloadSvg(`${fileStem}.svg`, currentSvg())}
         >
           Download SVG
         </button>
@@ -105,7 +117,10 @@ export function Controls({ machine }: ControlsProps) {
           className="ghost sm"
           onClick={() => {
             const pngHeight = Math.round((800 * height) / width);
-            void downloadPng(`cat-${traits.seed}.png`, renderCat(traits, { width: 800, height: pngHeight }), 800, pngHeight);
+            const svg = postcard
+              ? renderPostcard(traits, { ...card, width: 800, height: pngHeight, side, text })
+              : renderCat(traits, { width: 800, height: pngHeight });
+            void downloadPng(`${fileStem}.png`, svg, 800, pngHeight);
           }}
         >
           Download PNG
@@ -136,6 +151,116 @@ export function Controls({ machine }: ControlsProps) {
           </option>
         ))}
       </select>
+
+      <h2>Postcard</h2>
+      <div className="sizes">
+        <button type="button" aria-pressed={!postcard} onClick={() => machine.setMode('cat')}>
+          Plain cat
+        </button>
+        <button type="button" aria-pressed={postcard} onClick={() => machine.setMode('postcard')}>
+          Postcard
+        </button>
+      </div>
+      {postcard && (
+        <>
+          <div className="sizes" style={{ marginTop: 8 }}>
+            <button type="button" aria-pressed={side === 'front'} onClick={() => machine.setSide('front')}>
+              Front
+            </button>
+            <button type="button" aria-pressed={side === 'back'} onClick={() => machine.setSide('back')}>
+              Back
+            </button>
+          </div>
+          <input
+            type="text"
+            className="block"
+            value={text}
+            aria-label={side === 'front' ? 'Greeting' : 'Message'}
+            placeholder={side === 'front' ? greetingFor(traits.seed) : noteFor(traits.seed)}
+            maxLength={240}
+            onChange={(e) => machine.setText(e.target.value)}
+          />
+
+          {side === 'front' ? (
+            <input
+              type="text"
+              className="block"
+              value={card.caption ?? ''}
+              aria-label="Caption"
+              placeholder="Caption — small print under it"
+              maxLength={48}
+              onChange={(e) => machine.setCard({ caption: e.target.value })}
+            />
+          ) : (
+            <>
+              <input
+                type="text"
+                className="block"
+                value={card.to ?? ''}
+                aria-label="Addressed to"
+                placeholder={`To — ${catName(traits.seed)}`}
+                maxLength={40}
+                onChange={(e) => machine.setCard({ to: e.target.value })}
+              />
+              <input
+                type="text"
+                className="block"
+                value={card.from ?? ''}
+                aria-label="Signed by"
+                placeholder={`From — ${catName(traits.seed)}`}
+                maxLength={40}
+                onChange={(e) => machine.setCard({ from: e.target.value })}
+              />
+              {stamps > 0 && (
+                <input
+                  type="text"
+                  className="block"
+                  value={card.postmark ?? ''}
+                  aria-label="Postmark"
+                  placeholder={`Postmark — ${branded ? 'CATSVG' : markFor(traits.seed)}`}
+                  maxLength={12}
+                  onChange={(e) => machine.setCard({ postmark: e.target.value })}
+                />
+              )}
+            </>
+          )}
+
+          {side === 'back' && (
+            <div className="sizes" role="group" aria-label="Stamps">
+              <span className="hint" style={{ margin: '6px 4px 0 0' }}>
+                stamps
+              </span>
+              {STAMP_COUNTS.map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  aria-label={n === 0 ? 'No stamps' : `${n} stamp${n === 1 ? '' : 's'}`}
+                  aria-pressed={stamps === n}
+                  onClick={() => machine.setCard({ stamp: n })}
+                >
+                  {n === 0 ? 'none' : n}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="sizes">
+            <button
+              type="button"
+              aria-pressed={branded}
+              onClick={() => machine.setCard({ brand: !branded })}
+            >
+              CatSVG mark
+            </button>
+          </div>
+
+          <p className="hint">
+            {side === 'front'
+              ? 'Empty fields write themselves — the cat picks where it is writing from.'
+              : 'Empty fields write themselves — the cat writes its own note and signs it.'}
+          </p>
+        </>
+      )}
 
       <h2>Seed</h2>
       <div className="seedrow">

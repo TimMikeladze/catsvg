@@ -11,4 +11,5 @@ export * from './scenes';
 export * from './spec';
 export * from './traits';
 export * from './render';
+export * from './postcard';
 export * from './url';

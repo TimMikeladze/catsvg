@@ -41,7 +41,7 @@ export function computeFrame(width: number, height: number): Frame {
   return { x: 0, y: ART - h, w: ART, h };
 }
 
-const escapeXml = (s: string): string =>
+export const escapeXml = (s: string): string =>
   s.replace(/[<>&"']/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[c]!);
 
 function captionG(text: string, f: Frame, C: { cream: string }, ink: string): string {
@@ -68,36 +68,47 @@ export function describeCat(t: Traits): { title: string; desc: string } {
   };
 }
 
-/** Render a cat to a standalone SVG document string. */
-export function renderCat(t: Traits, opts: RenderOptions = {}): string {
-  const width = Math.round(opts.width ?? ART);
-  const height = Math.round(opts.height ?? width);
+/**
+ * Ids inside a cat must be unique per cat but stable per trait set — several
+ * cats share one document in the contact sheet, the React grids and the
+ * postcard, so anything nesting a second cat passes its own namespace.
+ */
+export const artId = (t: Traits, ns = ''): string =>
+  'c' + hash(t.seed + t.body + t.ears + t.coat + t.head).toString(36) + ns;
 
+export interface ArtOptions {
+  /** Suffix for generated ids, so several cats can share one document. */
+  ns?: string;
+  /** Corner radius of the clipped art rectangle, in art units. */
+  rx?: number;
+  /** Optional caption drawn on a pill at the bottom. */
+  text?: string;
+}
+
+/**
+ * The cat itself: its defs plus one clipped group, drawn in art coordinates
+ * inside {@link Frame}. `renderCat` wraps this in an `<svg>`; the contact sheet
+ * and the postcard nest it under a transform of their own.
+ */
+export function catArt(t: Traits, f: Frame, opts: ArtOptions = {}): string {
   const p = PALETTES[t.palette] ?? PALETTES.bistro;
   const body = BODIES[t.body] ?? BODIES.sit;
   const C = toneOf(t.tone, p);
-  const f = computeFrame(width, height);
   const r = rng(t.seed + '|art');
   const cx = body.hx;
   const cy = body.hy;
   const hs = body.hs;
   const [sx, sy] = HEADS[t.head] ?? HEADS.standard;
   const hp = headPath(cx, cy, t.ears);
-  // Ids must be unique per cat but stable per trait set — several cats share
-  // one document in the contact sheet and in the React grids.
-  const u = 'c' + hash(t.seed + t.body + t.ears + t.coat + t.head).toString(36);
+  const u = artId(t, opts.ns ?? '');
   const ink = mix(C.head, '#000000', 0.55);
   const sc = SIZES[t.size] ?? 1;
   const rot = POSTURES[t.posture] ?? 0;
 
-  const about = describeCat(t);
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${N(f.x)} ${N(f.y)} ${N(f.w)} ${N(f.h)}" width="${width}" height="${height}" role="img" aria-labelledby="t${u} d${u}">
-<title id="t${u}">${escapeXml(about.title)}</title><desc id="d${u}">${escapeXml(about.desc)}</desc>
-<defs>
+  return `<defs>
 <clipPath id="b${u}"><path d="${body.d}"/></clipPath>
 <clipPath id="h${u}"><path d="${hp}"/></clipPath>
-<clipPath id="f${u}"><rect x="${N(f.x)}" y="${N(f.y)}" width="${N(f.w)}" height="${N(f.h)}" rx="14"/></clipPath>
+<clipPath id="f${u}"><rect x="${N(f.x)}" y="${N(f.y)}" width="${N(f.w)}" height="${N(f.h)}" rx="${N(opts.rx ?? 14)}"/></clipPath>
 </defs>
 <g clip-path="url(#f${u})">
 ${sceneG(t.scene, p, r, f)}
@@ -126,21 +137,32 @@ ${propG(t.prop, C, p, t.propSide)}
 ${tintG(t.tint, f)}
 ${frameG(t.frame, p, C, f)}
 ${opts.text ? captionG(opts.text, f, C, ink) : ''}
-</g>
+</g>`;
+}
+
+/** Render a cat to a standalone SVG document string. */
+export function renderCat(t: Traits, opts: RenderOptions = {}): string {
+  const width = Math.round(opts.width ?? ART);
+  const height = Math.round(opts.height ?? width);
+  const f = computeFrame(width, height);
+  const u = artId(t);
+  const about = describeCat(t);
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${N(f.x)} ${N(f.y)} ${N(f.w)} ${N(f.h)}" width="${width}" height="${height}" role="img" aria-labelledby="t${u} d${u}">
+<title id="t${u}">${escapeXml(about.title)}</title><desc id="d${u}">${escapeXml(about.desc)}</desc>
+${catArt(t, f, { text: opts.text })}
 </svg>`;
 }
 
 /** Tile cats into one square contact sheet, e.g. a 3x3 export. */
 export function renderSheet(cats: Traits[], cols = 3, cell = 400): string {
   const rows = Math.ceil(cats.length / cols);
+  const f = computeFrame(ART, ART);
   const inner = cats
     .map((t, i) => {
-      // One document, one accessible name: the per-cat <title>/<desc> pair has
-      // to go, or the sheet announces itself nine times over.
-      const art = renderCat(t, { width: cell, height: cell })
-        .replace(/^<svg[^>]*>/, '')
-        .replace(/<title id="t[^"]*">[\s\S]*?<\/desc>/, '')
-        .replace(/<\/svg>$/, '');
+      // One document, one accessible name — the cells drop the per-cat
+      // <title>/<desc> pair, or the sheet announces itself nine times over.
+      const art = catArt(t, f, { ns: `s${i}` });
       return `<g transform="translate(${(i % cols) * cell},${Math.floor(i / cols) * cell}) scale(${cell / ART})">${art}</g>`;
     })
     .join('');

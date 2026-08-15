@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { makeTraits, newSeed } from '../cat/traits';
+import { POSTCARD_WIDTH, postcardHeightFor } from '../cat/postcard';
 import { buildCatPath, parseCatUrl } from '../cat/url';
 import { useLocalStorage } from './useLocalStorage';
+import type { PostcardSide } from '../cat/postcard';
+import type { CardFields, CatMode } from '../cat/url';
 import type { Locks, TraitKey, Traits } from '../cat/types';
 
 const LITTER_SIZE = 9;
@@ -22,6 +25,12 @@ export interface CatMachine {
   preset: string;
   width: number;
   height: number;
+  mode: CatMode;
+  side: PostcardSide;
+  /** Caption on a cat, greeting or message on a postcard. */
+  text: string;
+  /** The rest of what a postcard says — addressee, signature, marks. */
+  card: CardFields;
   litter: Traits[];
   favourites: CatRecipe[];
   roll: (seed?: string) => void;
@@ -32,6 +41,11 @@ export interface CatMachine {
   clearLocks: () => void;
   setPreset: (preset: string) => void;
   setSize: (width: number, height: number) => void;
+  setMode: (mode: CatMode) => void;
+  setSide: (side: PostcardSide) => void;
+  setText: (text: string) => void;
+  /** Patch one or more postcard fields, leaving the rest alone. */
+  setCard: (patch: CardFields) => void;
   saveFavourite: () => void;
   loadRecipe: (recipe: CatRecipe) => void;
   removeFavourite: (index: number) => void;
@@ -58,6 +72,15 @@ export function useCatMachine(): CatMachine {
   const [preset, setPresetState] = useState(initial.preset);
   const [width, setWidth] = useState(initial.width);
   const [height, setHeight] = useState(initial.height);
+  const [mode, setModeState] = useState<CatMode>(initial.mode);
+  const [side, setSide] = useState<PostcardSide>(initial.side);
+  const [text, setText] = useState(initial.text ?? '');
+  const [card, setCardState] = useState<CardFields>(initial.card);
+
+  const setCard = useCallback(
+    (patch: CardFields) => setCardState((prev) => ({ ...prev, ...patch })),
+    [],
+  );
   const [litterSeeds, setLitterSeeds] = useState<string[]>(() => seeds(LITTER_SIZE));
   const [favourites, setFavourites] = useLocalStorage<CatRecipe[]>(FAVOURITES_KEY, []);
 
@@ -112,6 +135,19 @@ export function useCatMachine(): CatMachine {
     setHeight(h);
   }, []);
 
+  // A square is the right default for a cat and the wrong one for a postcard,
+  // so switching modes moves the size off the other mode's default — and only
+  // off that default, never off a size the user chose.
+  const setMode = useCallback(
+    (next: CatMode) => {
+      setModeState(next);
+      const cardH = postcardHeightFor(POSTCARD_WIDTH);
+      if (next === 'postcard' && width === 400 && height === 400) setSize(POSTCARD_WIDTH, cardH);
+      if (next === 'cat' && width === POSTCARD_WIDTH && height === cardH) setSize(400, 400);
+    },
+    [width, height, setSize],
+  );
+
   const recipe = useMemo<CatRecipe>(() => ({ seed, locks, preset }), [seed, locks, preset]);
 
   const saveFavourite = useCallback(() => {
@@ -134,7 +170,7 @@ export function useCatMachine(): CatMachine {
 
   // Keep the address bar shareable: the page URL always describes the cat.
   useEffect(() => {
-    const path = buildCatPath({ seed, locks, preset, width, height });
+    const path = buildCatPath({ seed, locks, preset, width, height, mode, side, text, card });
     const query = path.slice(path.indexOf('?') === -1 ? path.length : path.indexOf('?'));
     const params = new URLSearchParams(query);
     params.set('seed', seed);
@@ -142,12 +178,18 @@ export function useCatMachine(): CatMachine {
       params.set('w', String(width));
       params.set('h', String(height));
     }
+    // The page is always `/`, so the mode rides in the query here even though
+    // the image URL wears it as a path segment.
+    if (mode === 'postcard') {
+      params.set('mode', 'postcard');
+      params.set('side', side);
+    }
     window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
-  }, [seed, locks, preset, width, height]);
+  }, [seed, locks, preset, width, height, mode, side, text, card]);
 
   return {
-    traits, seed, locks, preset, width, height, litter, favourites,
+    traits, seed, locks, preset, width, height, mode, side, text, card, litter, favourites,
     roll, refreshLitter, keep, toggleLock, setTrait, clearLocks, setPreset,
-    setSize, saveFavourite, loadRecipe, removeFavourite, recipe,
+    setSize, setMode, setSide, setText, setCard, saveFavourite, loadRecipe, removeFavourite, recipe,
   };
 }

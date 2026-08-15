@@ -12,6 +12,14 @@ const SIZE_PRESETS: Array<[number, number]> = [
   [600, 800],
 ];
 
+/** Card-shaped sizes — a postcard is landscape 3:2 unless you want it portrait. */
+const POSTCARD_PRESETS: Array<[number, number]> = [
+  [600, 400],
+  [900, 600],
+  [1200, 800],
+  [400, 600],
+];
+
 const origin = (): string => (typeof window === 'undefined' ? '' : window.location.origin);
 
 /**
@@ -42,14 +50,15 @@ export interface UrlPanelProps {
 
 /** The placeholder-service surface: copyable image URLs, and a URL you can paste back in. */
 export function UrlPanel({ machine }: UrlPanelProps) {
-  const { seed, locks, preset, width, height } = machine;
+  const { seed, locks, preset, width, height, mode, side, text, card } = machine;
   const [copied, setCopied] = useState<string | null>(null);
   const [pasted, setPasted] = useState('');
 
   const path = useMemo(
-    () => buildCatPath({ seed, locks, preset, width, height }),
-    [seed, locks, preset, width, height],
+    () => buildCatPath({ seed, locks, preset, width, height, mode, side, text, card }),
+    [seed, locks, preset, width, height, mode, side, text, card],
   );
+  const sizes = mode === 'postcard' ? POSTCARD_PRESETS : SIZE_PRESETS;
   const url = origin() + path;
 
   const imgTag = `<img src="${url}" width="${width}" height="${height}" alt="${catName(seed)}" />`;
@@ -73,10 +82,10 @@ export function UrlPanel({ machine }: UrlPanelProps) {
 
   return (
     <div className="card urlcard">
-      <h2>Cat URL — drop it in any &lt;img&gt;</h2>
+      <h2>{mode === 'postcard' ? 'Postcard URL' : 'Cat URL'} — drop it in any &lt;img&gt;</h2>
 
       <div className="sizes">
-        {SIZE_PRESETS.map(([w, h]) => (
+        {sizes.map(([w, h]) => (
           <button
             key={`${w}x${h}`}
             type="button"
@@ -144,7 +153,7 @@ export function UrlPanel({ machine }: UrlPanelProps) {
           type="text"
           value={pasted}
           aria-label="Paste a cat URL"
-          placeholder="/cat/1200x300/mackerel.svg"
+          placeholder="/cat/postcard/900x600/mackerel.svg"
           onChange={(e) => setPasted(e.target.value)}
         />
         <button
@@ -154,6 +163,11 @@ export function UrlPanel({ machine }: UrlPanelProps) {
           onClick={() => {
             if (!pastedRequest) return;
             machine.loadRecipe({ seed: pastedRequest.seed, locks: pastedRequest.locks, preset: pastedRequest.preset });
+            machine.setMode(pastedRequest.mode);
+            machine.setSide(pastedRequest.side);
+            machine.setText(pastedRequest.text ?? '');
+            machine.setCard(pastedRequest.card);
+            // Last, so the size in the URL wins over the mode's default size.
             machine.setSize(pastedRequest.width, pastedRequest.height);
           }}
         >
@@ -176,6 +190,7 @@ export function UrlPanel({ machine }: UrlPanelProps) {
           <p className="hint">
             seed <strong>{pastedRequest.seed}</strong> · {pastedRequest.width}×{pastedRequest.height} ·{' '}
             {pastedRequest.preset}
+            {pastedRequest.mode === 'postcard' ? ` · postcard ${pastedRequest.side}` : ''}
             {Object.keys(pastedRequest.locks).length > 0
               ? ` · pinned ${Object.entries(pastedRequest.locks)
                   .map(([k, v]) => `${k}=${v}`)

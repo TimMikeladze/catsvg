@@ -36,11 +36,7 @@ export function App() {
           cards reorder: cat, controls, URL — see the ordering rules in styles.css. */}
       <div className="layout">
         <div className="col">
-          <Stage
-            traits={machine.traits}
-            locks={machine.locks}
-            onToggleLock={machine.toggleLock}
-          />
+          <Stage machine={machine} />
           <UrlPanel machine={machine} />
           <Litter litter={machine.litter} onKeep={machine.keep} />
           <ApiDocs />
