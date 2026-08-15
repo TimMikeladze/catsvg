@@ -21,14 +21,19 @@ export function makeTraits(seed: string, locks: Locks = {}, preset: string = 'an
     t[k] = pick(r, pool && pool.length ? pool : SPEC[k]);
   }
   t.tilt = N(rr(r, -26, 26));
-  t.propSide = r() < 0.5;
   Object.assign(t, locks);
+
+  // Most tails live on the cat's right, so floor props belong on the open
+  // side. The wrap tail crosses left and flips that staging. Keeping the two
+  // apart prevents props from being swallowed by a random tail silhouette.
+  t.propSide = t.tail !== 'wrap';
 
   // Bodies whose head sits low have no neck to hang things from, and nothing
   // to hold an item in front of — unless the user pinned that trait.
   const b = BODIES[t.body];
   if (b.hy > 240 && NECK.includes(t.extra) && !locks.extra) t.extra = 'none';
   if (b.hy > 240 && !locks.hold) t.hold = 'none';
+  if (['sleepy', 'squint', 'wink', 'half'].includes(t.eyes) && !locks.lashes) t.lashes = 'none';
   return t;
 }
 

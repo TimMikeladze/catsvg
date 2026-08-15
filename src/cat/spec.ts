@@ -1,4 +1,4 @@
-import { BODIES, FLUFF, POSTURES, SIZES } from './bodies';
+import { BODIES, FLUFF } from './bodies';
 import { COATS } from './coats';
 import { EARS, HEADS } from './heads';
 import { EYES, FACES, LASHES, MOUTHS, NOSES, WHISKERS } from './face';
@@ -17,8 +17,10 @@ export const SPEC: Record<TraitKey, readonly string[]> = {
   palette: Object.keys(PALETTES),
   tone: TONES,
   body: Object.keys(BODIES),
-  size: Object.keys(SIZES),
-  posture: Object.keys(POSTURES),
+  // Repeated entries weight the neutral choices without leaking internal
+  // aliases such as "regular2" into the public picker/API.
+  size: ['regular', 'regular', 'petite', 'grand'],
+  posture: ['upright', 'upright', 'tiltleft', 'tiltright'],
   coat: COATS,
   fluff: FLUFF,
   face: FACES,

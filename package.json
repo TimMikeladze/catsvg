@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "images": "bun scripts/images.ts"
+    "images": "bun scripts/images.ts",
+    "art:audit": "bun scripts/audit-art.ts"
   },
   "dependencies": {
     "react": "^19.2.8",

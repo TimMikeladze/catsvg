@@ -38,6 +38,18 @@ export interface Body {
   tx: number;
   /** Tail root y. */
   ty: number;
+  /** Front-paw group centre and baseline. */
+  px: number;
+  py: number;
+  /** Horizontal spacing of the paired front paws. */
+  ps: number;
+  /** Centre of an object held against the chest. */
+  holdX: number;
+  holdY: number;
+  /** Width of the grounded shadow for this silhouette. */
+  shadowRx: number;
+  /** Optional horizontal shadow centre for asymmetric poses. */
+  shadowX?: number;
 }
 
 /**

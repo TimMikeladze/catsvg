@@ -9,7 +9,7 @@ by a deterministic generator — no image files, no storage, no network calls.
 <img src="https://catsvg.vercel.app/cat/1200x300/mackerel.svg" width="1200" height="300" />
 ```
 
-Same seed, same cat, forever. ~2.9 × 10¹⁴ combinations.
+Same seed, same cat, forever. ~1.7 × 10²³ combinations.
 
 ## Running it
 
@@ -20,6 +20,7 @@ bun run test       # vitest
 bun run typecheck
 bun run build      # tsc + vite build
 bun run images     # regenerate the favicon, touch icon and social card
+bun run art:audit  # render every part + a 25-cat QA atlas to /tmp/catsvg-audit
 ```
 
 `bun run dev` serves the SPA *and* the `/cat/*` image endpoint through the same

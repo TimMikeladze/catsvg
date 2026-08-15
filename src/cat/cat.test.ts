@@ -3,6 +3,7 @@ import { computeFrame, describeCat, renderCat, renderSheet } from './render';
 import { catName, makeTraits } from './traits';
 import { SPEC, TRAIT_OPTIONS } from './spec';
 import { TRAIT_KEYS } from './types';
+import { mouthG } from './face';
 
 describe('makeTraits', () => {
   it('is deterministic for a seed', () => {
@@ -29,6 +30,16 @@ describe('makeTraits', () => {
     expect(t.extra).toBe('bell');
     const rolled = makeTraits('anything', { body: 'curl' });
     expect(rolled.hold).toBe('none');
+  });
+
+  it('stages floor props away from the tail', () => {
+    expect(makeTraits('prop-right-tail', { tail: 'up' }).propSide).toBe(true);
+    expect(makeTraits('prop-wrap-tail', { tail: 'wrap' }).propSide).toBe(false);
+  });
+
+  it('avoids floating lashes on closed eyes unless explicitly pinned', () => {
+    expect(makeTraits('closed-eyes', { eyes: 'sleepy' }).lashes).toBe('none');
+    expect(makeTraits('closed-eyes', { eyes: 'sleepy', lashes: 'long' }).lashes).toBe('long');
   });
 
   it('respects a preset pool', () => {
@@ -121,6 +132,14 @@ describe('renderCat', () => {
       const svg = renderCat(makeTraits(`frame-${w}-${h}`), { width: w, height: h });
       expect(svg).not.toContain('NaN');
     }
+  });
+});
+
+describe('facial construction', () => {
+  it('draws the smirk as a complete two-sided mouth', () => {
+    const smirk = mouthG('smirk', 200, 190, '#111', '#f66', '#fff');
+    expect(smirk).toContain('q-8,5 -14,-1');
+    expect(smirk).toContain('q11,7 18,-4');
   });
 });
 

@@ -50,8 +50,10 @@ describe('App', () => {
     const eyeChip = chips.getByText(/eyes$/);
     const label = eyeChip.textContent;
     await user.click(eyeChip);
+    expect(eyeChip).toHaveAttribute('aria-pressed', 'true');
     await user.click(screen.getByRole('button', { name: /New cat/ }));
-    expect(chips.getByText(/eyes$/).textContent).toBe(`🔒 ${label}`);
+    expect(chips.getByText(/eyes$/).textContent).toBe(label);
+    expect(chips.getByText(/eyes$/)).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('puts the current cat in a copyable image URL', async () => {

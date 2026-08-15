@@ -101,15 +101,14 @@ export function renderCat(t: Traits, opts: RenderOptions = {}): string {
 </defs>
 <g clip-path="url(#f${u})">
 ${sceneG(t.scene, p, r, f)}
+<ellipse cx="${N(body.shadowX ?? 200)}" cy="362" rx="${N(body.shadowRx * sc)}" ry="14" fill="${p.a}" opacity=".16"/>
 <g transform="translate(200,368) scale(${sc}) rotate(${rot}) translate(-200,-368)">
-<ellipse cx="200" cy="360" rx="128" ry="16" fill="${p.a}" opacity=".18"/>
 <g>${tailLayer(t.tail, t.tailtip, body, C)}</g>
 ${fluffG(t.fluff, body, C)}
 <path d="${body.d}" fill="${C.body}"/>
 <g clip-path="url(#b${u})">${coatG(t.coat, C, r)}</g>
-${holdG(t.hold, C, p)}
-${pawsG(t.paws, C)}
-${propG(t.prop, C, p, t.propSide)}
+${pawsG(t.paws, body, C)}
+${holdG(t.hold, body, C, p)}
 <g transform="translate(${cx},${cy}) scale(${N(hs * sx)},${N(hs * sy)}) translate(${-cx},${-cy})">
   <path d="${hp}" fill="${C.head}"/>
   <g clip-path="url(#h${u})">${faceG(t.face, cx, cy, C, t.tilt)}</g>
@@ -123,6 +122,7 @@ ${propG(t.prop, C, p, t.propSide)}
 </g>
 <g>${auraG(t.aura, cx, cy, C, p)}</g>
 </g>
+${propG(t.prop, C, p, t.propSide)}
 ${tintG(t.tint, f)}
 ${frameG(t.frame, p, C, f)}
 ${opts.text ? captionG(opts.text, f, C, ink) : ''}

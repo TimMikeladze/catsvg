@@ -1,30 +1,34 @@
-import type { Colors, Palette } from './types';
+import type { Body, Colors, Palette } from './types';
 
 export const PAWS = ['none', 'two', 'crossed', 'tucked', 'spread', 'beans'] as const;
 
-export function pawsG(k: string, C: Colors): string {
-  const y = 340;
+export function pawsG(k: string, body: Body, C: Colors): string {
+  const x = body.px;
+  const y = body.py;
+  const gap = body.ps;
   const col = C.cream;
   if (k === 'two')
-    return `<rect x="164" y="${y}" width="30" height="18" rx="9" fill="${col}"/><rect x="206" y="${y}" width="30" height="18" rx="9" fill="${col}"/>`;
+    return `<rect x="${x - gap - 15}" y="${y}" width="30" height="18" rx="9" fill="${col}"/><rect x="${x + gap - 15}" y="${y}" width="30" height="18" rx="9" fill="${col}"/>`;
   if (k === 'crossed')
-    return `<rect x="158" y="${y + 2}" width="46" height="17" rx="8.5" fill="${col}" transform="rotate(-8 181 ${y + 10})"/><rect x="196" y="${y}" width="46" height="17" rx="8.5" fill="${col}" transform="rotate(6 219 ${y + 8})"/>`;
-  if (k === 'tucked') return `<path d="M168,${y + 4} q32,-12 64,0 q-32,16 -64,0 Z" fill="${col}"/>`;
+    return `<rect x="${x - 42}" y="${y + 2}" width="46" height="17" rx="8.5" fill="${col}" transform="rotate(-8 ${x - 19} ${y + 10})"/><rect x="${x - 4}" y="${y}" width="46" height="17" rx="8.5" fill="${col}" transform="rotate(6 ${x + 19} ${y + 8})"/>`;
+  if (k === 'tucked') return `<path d="M${x - 32},${y + 4} q32,-12 64,0 q-32,16 -64,0 Z" fill="${col}"/>`;
   if (k === 'spread')
-    return `<rect x="126" y="${y}" width="34" height="18" rx="9" fill="${col}"/><rect x="240" y="${y}" width="34" height="18" rx="9" fill="${col}"/><rect x="183" y="${y + 2}" width="34" height="18" rx="9" fill="${col}"/>`;
+    return `<rect x="${x - gap * 2 - 17}" y="${y}" width="34" height="18" rx="9" fill="${col}"/><rect x="${x + gap * 2 - 17}" y="${y}" width="34" height="18" rx="9" fill="${col}"/><rect x="${x - 17}" y="${y + 2}" width="34" height="18" rx="9" fill="${col}"/>`;
   if (k === 'beans')
-    return `<rect x="164" y="${y}" width="30" height="18" rx="9" fill="${col}"/><rect x="206" y="${y}" width="30" height="18" rx="9" fill="${col}"/>
-    <circle cx="179" cy="${y + 9}" r="4.5" fill="${C.pop}"/><circle cx="221" cy="${y + 9}" r="4.5" fill="${C.pop}"/>`;
+    return `<rect x="${x - gap - 15}" y="${y}" width="30" height="18" rx="9" fill="${col}"/><rect x="${x + gap - 15}" y="${y}" width="30" height="18" rx="9" fill="${col}"/>
+    <circle cx="${x - gap}" cy="${y + 9}" r="4.5" fill="${C.pop}"/><circle cx="${x + gap}" cy="${y + 9}" r="4.5" fill="${C.pop}"/>`;
   return '';
 }
 
 export const HOLDS = ['none', 'none', 'none', 'fish', 'mug', 'book', 'balloon', 'pencil', 'snack'] as const;
 
 /** Item held in front of the chest. */
-export function holdG(k: string, C: Colors, p: Palette): string {
-  const x = 200;
-  const y = 336;
-  const wrap = (g: string) => `<g transform="translate(${x},${y}) scale(.86) translate(${-x},${-y})">${g}</g>`;
+export function holdG(k: string, body: Body, C: Colors, p: Palette): string {
+  if (k === 'none') return '';
+  const x = body.holdX;
+  const y = body.holdY;
+  const hands = `<ellipse cx="${x - 24}" cy="${y + 7}" rx="18" ry="11" fill="${C.cream}" transform="rotate(18 ${x - 24} ${y + 7})"/><ellipse cx="${x + 24}" cy="${y + 7}" rx="18" ry="11" fill="${C.cream}" transform="rotate(-18 ${x + 24} ${y + 7})"/>`;
+  const wrap = (g: string) => `<g>${hands}<g transform="translate(${x},${y}) scale(.94) translate(${-x},${-y})">${g}</g></g>`;
   switch (k) {
     case 'fish':
       return wrap(`<g transform="translate(${x},${y})"><path d="M-26,0 q16,-17 32,0 q-17,17 -32,0 Z" fill="${C.cream}" stroke="${p.a}" stroke-width="2"/><path d="M6,0 l17,-11 0,22 Z" fill="${C.cream}" stroke="${p.a}" stroke-width="2"/><circle cx="-13" cy="-2" r="2" fill="${p.a}"/></g>`);

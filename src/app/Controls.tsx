@@ -4,11 +4,44 @@ import { PRESET_NAMES, TRAIT_OPTIONS } from '../cat/spec';
 import { renderCat, renderSheet } from '../cat/render';
 import { makeTraits, newSeed } from '../cat/traits';
 import { copyText, downloadPng, downloadSvg } from './download';
-import { TRAIT_KEYS } from '../cat/types';
 import type { TraitKey } from '../cat/types';
 import type { CatMachine } from './useCatMachine';
 
 const SHEET_CELLS = 9;
+
+const TINKER_GROUPS: Array<{ label: string; keys: TraitKey[] }> = [
+  { label: 'Silhouette', keys: ['body', 'size', 'posture', 'fluff', 'tail', 'tailtip', 'paws'] },
+  { label: 'Face', keys: ['head', 'ears', 'eyes', 'lashes', 'nose', 'mouth', 'whiskers', 'face'] },
+  { label: 'Fur & colour', keys: ['palette', 'tone', 'coat'] },
+  { label: 'Character', keys: ['extra', 'hold', 'prop', 'aura'] },
+  { label: 'Backdrop', keys: ['scene', 'tint', 'frame'] },
+];
+
+const FIELD_LABEL: Partial<Record<TraitKey, string>> = {
+  tailtip: 'tail tip',
+  paws: 'front paws',
+  face: 'face marking',
+  extra: 'accessory',
+  hold: 'held item',
+  prop: 'floor prop',
+  aura: 'mood marks',
+  tint: 'colour wash',
+  frame: 'border',
+};
+
+const VALUE_LABEL: Record<string, string> = {
+  tiltleft: 'tilt left',
+  tiltright: 'tilt right',
+  vstripes: 'vertical stripes',
+  starchest: 'star chest',
+  patcheye: 'eye patch',
+  longhair: 'long hair',
+  onesided: 'one-sided',
+  partyhat: 'party hat',
+  hairbow: 'hair bow',
+};
+
+const pretty = (value: string): string => VALUE_LABEL[value] ?? value;
 
 export interface ControlsProps {
   machine: CatMachine;
@@ -20,11 +53,12 @@ export function Controls({ machine }: ControlsProps) {
   const [seedDraft, setSeedDraft] = useState('');
   const [copyLabel, setCopyLabel] = useState('Copy SVG code');
 
-  // Eighteen dropdowns is a wall on a phone: fold them away there, keep them
+  // Twenty-five dropdowns is a wall on a phone: fold them away there, keep them
   // open on the desktop column where there is room for them.
   const narrow = useMediaQuery(NARROW);
   const [tinkerOpen, setTinkerOpen] = useState(() => !narrow);
   useEffect(() => setTinkerOpen(!narrow), [narrow]);
+  const lockCount = Object.keys(locks).length;
 
   const currentSvg = () => renderCat(traits, { width, height });
 
@@ -48,11 +82,17 @@ export function Controls({ machine }: ControlsProps) {
 
   return (
     <div className="card controls">
-      <h2>Make a cat</h2>
-      <button type="button" onClick={() => machine.roll()}>
-        New cat <span style={{ opacity: 0.5, fontSize: 13 }}>(space)</span>
+      <div className="card-heading">
+        <div>
+          <h2>Cat studio</h2>
+          <p>Roll freely, then pin the parts worth keeping.</p>
+        </div>
+        <span className="keyhint">space</span>
+      </div>
+      <button type="button" className="primary-action" aria-label="New cat" onClick={() => machine.roll()}>
+        Roll a new cat
       </button>
-      <div className="row2">
+      <div className="action-grid">
         <button
           type="button"
           className="ghost sm"
@@ -71,7 +111,7 @@ export function Controls({ machine }: ControlsProps) {
           Download PNG
         </button>
       </div>
-      <div className="row2">
+      <div className="action-grid">
         <button type="button" className="ghost sm" onClick={() => void onCopy()}>
           {copyLabel}
         </button>
@@ -79,16 +119,16 @@ export function Controls({ machine }: ControlsProps) {
           Export 3×3 sheet
         </button>
       </div>
-      <button type="button" className="ghost sm" onClick={machine.saveFavourite}>
-        Save to favourites
+      <button type="button" className="ghost sm save-action" aria-label="Save to favourites" onClick={machine.saveFavourite}>
+        + Save this cat
       </button>
 
-      <h2>Style preset</h2>
+      <h2>Art direction</h2>
       <select
         aria-label="Style preset"
         value={preset}
         onChange={(e) => machine.setPreset(e.target.value)}
-        style={{ marginBottom: 4 }}
+        className="preset-select"
       >
         {PRESET_NAMES.map((p) => (
           <option key={p} value={p}>
@@ -97,7 +137,7 @@ export function Controls({ machine }: ControlsProps) {
         ))}
       </select>
 
-      <h2>Type a seed</h2>
+      <h2>Seed</h2>
       <div className="seedrow">
         <input
           type="text"
@@ -109,7 +149,7 @@ export function Controls({ machine }: ControlsProps) {
             if (e.key === 'Enter') submitSeed();
           }}
         />
-        <button type="button" className="ghost" style={{ width: 'auto', margin: 0, padding: '11px 16px' }} onClick={submitSeed}>
+        <button type="button" className="ghost seed-go" onClick={submitSeed}>
           Go
         </button>
       </div>
@@ -121,30 +161,37 @@ export function Controls({ machine }: ControlsProps) {
         onToggle={(e) => setTinkerOpen(e.currentTarget.open)}
       >
         <summary>
-          <h2>Tinker</h2>
+          <h2>Tinker{lockCount > 0 ? ` · ${lockCount} pinned` : ''}</h2>
         </summary>
         <div className="tinker">
-          {TRAIT_KEYS.map((key: TraitKey) => (
-            <div key={key}>
-              <label className="f" htmlFor={`s_${key}`}>
-                {key}
-              </label>
-              <select
-                id={`s_${key}`}
-                value={traits[key]}
-                onChange={(e) => machine.setTrait(key, e.target.value)}
-              >
-                {TRAIT_OPTIONS[key].map((v) => (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
+          {TINKER_GROUPS.map((group) => (
+            <fieldset key={group.label} className="tinker-group">
+              <legend>{group.label}</legend>
+              <div className="tinker-grid">
+                {group.keys.map((key) => (
+                  <div key={key} className={locks[key] ? 'field pinned' : 'field'}>
+                    <label className="f" htmlFor={`s_${key}`}>
+                      {FIELD_LABEL[key] ?? key}
+                    </label>
+                    <select
+                      id={`s_${key}`}
+                      value={traits[key]}
+                      onChange={(e) => machine.setTrait(key, e.target.value)}
+                    >
+                      {TRAIT_OPTIONS[key].map((v) => (
+                        <option key={v} value={v}>
+                          {pretty(v)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 ))}
-              </select>
-            </div>
+              </div>
+            </fieldset>
           ))}
         </div>
-        <button type="button" className="ghost sm" style={{ marginTop: 10 }} onClick={machine.clearLocks}>
-          Clear all locks
+        <button type="button" className="text-action" disabled={lockCount === 0} onClick={machine.clearLocks}>
+          Clear pinned traits
         </button>
       </details>
     </div>

@@ -76,11 +76,12 @@ export const MOUTHS = ['w', 'smirk', 'open', 'tongue', 'fang', 'grin', 'frown', 
 export function mouthG(k: string, cx: number, y: number, ink: string, pop: string, cream: string): string {
   const s = `stroke="${ink}" stroke-width="3" fill="none" stroke-linecap="round"`;
   if (k === 'w') return `<path d="M${cx},${y + 10} v6 M${cx},${y + 16} q-9,7 -15,-1 M${cx},${y + 16} q9,7 15,-1" ${s}/>`;
-  if (k === 'smirk') return `<path d="M${cx},${y + 10} v5 M${cx},${y + 15} q11,6 17,-3" ${s}/>`;
+  if (k === 'smirk')
+    return `<path d="M${cx},${y + 10} v6 M${cx},${y + 16} q-8,5 -14,-1 M${cx},${y + 16} q11,7 18,-4" ${s}/>`;
   if (k === 'open')
     return `<path d="M${cx},${y + 10} v4" ${s}/><ellipse cx="${cx}" cy="${y + 21}" rx="8" ry="9" fill="${ink}"/><ellipse cx="${cx}" cy="${y + 25}" rx="4.5" ry="4" fill="${pop}"/>`;
   if (k === 'tongue')
-    return `<path d="M${cx},${y + 10} v6 M${cx},${y + 16} q-9,7 -15,-1" ${s}/><path d="M${cx + 2},${y + 16} q10,2 8,12 q-8,4 -10,-6 Z" fill="${pop}"/>`;
+    return `<path d="M${cx},${y + 10} v6 M${cx},${y + 16} q-9,7 -15,-1 M${cx},${y + 16} q9,7 15,-1" ${s}/><path d="M${cx + 2},${y + 18} q10,2 8,12 q-8,4 -10,-6 Z" fill="${pop}"/>`;
   if (k === 'fang')
     return `<path d="M${cx},${y + 10} v6 M${cx},${y + 16} q-9,7 -15,-1 M${cx},${y + 16} q9,7 15,-1" ${s}/><path d="M${cx - 9},${y + 18} l5,0 -2.5,9 Z" fill="${cream}"/><path d="M${cx + 4},${y + 18} l5,0 -2.5,9 Z" fill="${cream}"/>`;
   if (k === 'grin')
@@ -118,7 +119,7 @@ export const FACES = [
 /** Face markings. Clipped to the head silhouette by the caller. */
 export function faceG(k: string, cx: number, cy: number, C: Colors, tilt: number): string {
   if (k === 'split')
-    return `<path d="M${cx - 120},${cy + tilt + 12} L${cx + 120},${cy - tilt + 12} L${cx + 120},${cy + 150} L${cx - 120},${cy + 150} Z" fill="${C.mark}"/>`;
+    return `<path d="M${cx + tilt},${cy - 120} L${cx + 120},${cy - 120} L${cx + 120},${cy + 150} L${cx - tilt},${cy + 150} Z" fill="${C.mark}"/>`;
   if (k === 'blaze')
     return `<path d="M${cx - 13},${cy - 112} L${cx + 13},${cy - 112} L${cx + 7},${cy + 8} L${cx - 7},${cy + 8} Z" fill="${C.cream}"/>`;
   if (k === 'mask')
@@ -128,13 +129,7 @@ export function faceG(k: string, cx: number, cy: number, C: Colors, tilt: number
   if (k === 'tabby')
     return `<g stroke="${C.mark}" stroke-width="5" stroke-linecap="round" fill="none"><path d="M${cx - 26},${cy - 52} l6,20 M${cx},${cy - 58} v20 M${cx + 26},${cy - 52} l-6,20"/></g>`;
   if (k === 'freckles') {
-    let s = '';
-    for (let i = 0; i < 8; i++) {
-      const dx = (i % 4) * 11 - 16;
-      const dy = Math.floor(i / 4) * 9;
-      s += `<circle cx="${cx + (i < 4 ? -44 + dx : 44 + dx)}" cy="${cy + 22 + dy}" r="2.6" fill="${C.mark}" opacity=".8"/>`;
-    }
-    return s;
+    return [-1, 1].map((side) => `<g fill="${C.mark}" opacity=".78"><circle cx="${cx + side * 35}" cy="${cy + 22}" r="2.6"/><circle cx="${cx + side * 46}" cy="${cy + 27}" r="2.2"/><circle cx="${cx + side * 55}" cy="${cy + 20}" r="2"/><circle cx="${cx + side * 40}" cy="${cy + 33}" r="1.8"/></g>`).join('');
   }
   if (k === 'blush')
     return `<ellipse cx="${cx - 46}" cy="${cy + 20}" rx="17" ry="10" fill="${C.pop}" opacity=".55"/><ellipse cx="${cx + 46}" cy="${cy + 20}" rx="17" ry="10" fill="${C.pop}" opacity=".55"/>`;
@@ -148,10 +143,8 @@ export function faceG(k: string, cx: number, cy: number, C: Colors, tilt: number
   if (k === 'beard')
     return `<path d="M${cx - 40},${cy + 34} q40,26 80,0 q-8,34 -40,34 q-32,0 -40,-34 Z" fill="${C.cream}"/>`;
   if (k === 'specks') {
-    let s = '';
-    for (let i = 0; i < 12; i++)
-      s += `<circle cx="${N(cx - 70 + i * 13)}" cy="${N(cy - 46 + (i % 3) * 10)}" r="3" fill="${C.mark}" opacity=".7"/>`;
-    return s;
+    const pts = [[-56,-40],[-35,-50],[-12,-43],[12,-50],[36,-41],[55,-48],[-47,-27],[-22,-31],[3,-27],[27,-32],[49,-24],[-4,-38]];
+    return pts.map(([dx, dy], i) => `<circle cx="${N(cx + dx)}" cy="${N(cy + dy)}" r="${i % 3 === 0 ? 3 : 2.3}" fill="${C.mark}" opacity=".72"/>`).join('');
   }
   return '';
 }

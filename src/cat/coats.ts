@@ -70,7 +70,7 @@ export function coatG(k: string, C: Colors, r: Rng): string {
     }
     return s;
   }
-  if (k === 'belly') return `<ellipse cx="200" cy="352" rx="86" ry="46" fill="${C.cream}"/>`;
+  if (k === 'belly') return `<ellipse cx="200" cy="326" rx="72" ry="68" fill="${C.cream}"/>`;
   if (k === 'van')
     return `<rect x="60" y="200" width="340" height="200" fill="${C.cream}"/><path d="M92,232 C150,214 250,214 308,232 L308,288 C250,266 150,266 92,288 Z" fill="${C.body}"/>`;
   if (k === 'harlequin') return `<path d="M60,200 L400,380 L400,200 Z" fill="${C.mark}"/>`;

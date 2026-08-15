@@ -25,12 +25,17 @@ export function Stage({ traits, locks, onToggleLock }: StageProps) {
 
   return (
     <div className="card stage">
-      <CatSvg traits={traits} width={400} />
-      <div className="name">{catName(traits.seed)}</div>
-      <div className="seedline">seed · {traits.seed}</div>
+      <div className="artboard"><CatSvg traits={traits} width={400} /></div>
+      <div className="cat-id">
+        <div>
+          <div className="name">{catName(traits.seed)}</div>
+          <div className="seedline">seed · {traits.seed}</div>
+        </div>
+        <span className="edition">one of one</span>
+      </div>
       <details className="fold" open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>
         <summary>
-          <h2>Traits{lockCount > 0 ? ` · ${lockCount} locked` : ''}</h2>
+          <h2>Traits{lockCount > 0 ? ` · ${lockCount} pinned` : ''}</h2>
         </summary>
         <div className="chips">
           {CHIP_ORDER.map((key) => {
@@ -43,13 +48,13 @@ export function Stage({ traits, locks, onToggleLock }: StageProps) {
                 aria-pressed={locked}
                 onClick={() => onToggleLock(key)}
               >
-                {locked ? '🔒 ' : ''}
+                {locked && <span className="pin-mark" aria-hidden="true" />}
                 {TRAIT_LABEL[key](traits)}
               </button>
             );
           })}
         </div>
-        <p className="hint">Tap a trait to lock it — locked traits survive the next roll.</p>
+        <p className="hint">Tap a trait to pin it — pinned traits survive the next roll.</p>
       </details>
     </div>
   );
