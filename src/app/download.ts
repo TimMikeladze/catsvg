@@ -13,8 +13,11 @@ export function downloadSvg(filename: string, svg: string): void {
   downloadBlob(filename, new Blob([svg], { type: 'image/svg+xml' }));
 }
 
-/** Rasterise an SVG string through an offscreen canvas. */
-export function downloadPng(filename: string, svg: string, width: number, height: number): Promise<void> {
+/**
+ * Rasterise an SVG string to a PNG blob through an offscreen canvas. Downloads
+ * and share sheets both want bytes, so the raster lives here once.
+ */
+export function svgToPngBlob(svg: string, width: number, height: number): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
@@ -26,13 +29,16 @@ export function downloadPng(filename: string, svg: string, width: number, height
       ctx.drawImage(img, 0, 0, width, height);
       canvas.toBlob((blob) => {
         if (!blob) return reject(new Error('canvas toBlob failed'));
-        downloadBlob(filename, blob);
-        resolve();
+        resolve(blob);
       }, 'image/png');
     };
     img.onerror = () => reject(new Error('SVG could not be rasterised'));
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
   });
+}
+
+export async function downloadPng(filename: string, svg: string, width: number, height: number): Promise<void> {
+  downloadBlob(filename, await svgToPngBlob(svg, width, height));
 }
 
 export async function copyText(text: string): Promise<boolean> {

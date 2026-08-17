@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from './App';
@@ -138,6 +138,58 @@ describe('App', () => {
     press('3 stamps');
     expect(url()).toContain('stamp=3');
     expect(stage()?.innerHTML.match(/1 CAT/g)).toHaveLength(3);
+  });
+
+  it('offers hand-rolled share targets when the device has no share sheet', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    fireEvent.change(screen.getByLabelText('Seed word'), { target: { value: 'mackerel' } });
+    press('Go');
+
+    // jsdom has no navigator.share, which is exactly the desktop case.
+    await user.click(screen.getByRole('button', { name: 'Share this cat' }));
+
+    const mail = await screen.findByRole('menuitem', { name: 'Email a draft' });
+    expect(mail).toHaveAttribute('href', expect.stringContaining('mailto:?subject='));
+    expect(decodeURIComponent(mail.getAttribute('href') ?? '')).toContain('seed=mackerel');
+    expect(screen.getByRole('menuitem', { name: 'Messages' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('sms:?&body='),
+    );
+    expect(screen.getByRole('menuitem', { name: 'Download PNG' })).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('menuitem', { name: 'Copy link' })).not.toBeInTheDocument();
+  });
+
+  it('shares a postcard as a postcard, both sides of it', async () => {
+    const user = userEvent.setup();
+    const nav = navigator as unknown as Record<string, unknown>;
+    const share = vi.fn().mockResolvedValue(undefined);
+    nav.share = share;
+    // jsdom cannot rasterise, so this exercises the link share and the copy.
+    nav.canShare = () => false;
+    try {
+      render(<App />);
+      press('Postcard');
+      press('Back');
+      fireEvent.change(screen.getByLabelText('Signed by'), { target: { value: 'The Cat' } });
+
+      await user.click(screen.getByRole('button', { name: 'Share this postcard' }));
+      expect(share).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: expect.stringContaining('A postcard from'),
+          text: expect.stringContaining('The Cat'),
+          url: expect.stringContaining('mode=postcard'),
+        }),
+      );
+
+      await user.click(screen.getByRole('button', { name: 'More ways to share' }));
+      expect(await screen.findByRole('menuitem', { name: 'Download both sides' })).toBeInTheDocument();
+    } finally {
+      delete nav.share;
+      delete nav.canShare;
+    }
   });
 
   it('loads a pasted cat URL', async () => {

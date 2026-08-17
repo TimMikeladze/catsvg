@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { makeTraits, newSeed } from '../cat/traits';
 import { POSTCARD_WIDTH, postcardHeightFor } from '../cat/postcard';
-import { buildCatPath, parseCatUrl } from '../cat/url';
+import { buildStudioQuery, parseCatUrl } from '../cat/url';
 import { useLocalStorage } from './useLocalStorage';
 import type { PostcardSide } from '../cat/postcard';
 import type { CardFields, CatMode } from '../cat/url';
@@ -170,21 +170,8 @@ export function useCatMachine(): CatMachine {
 
   // Keep the address bar shareable: the page URL always describes the cat.
   useEffect(() => {
-    const path = buildCatPath({ seed, locks, preset, width, height, mode, side, text, card });
-    const query = path.slice(path.indexOf('?') === -1 ? path.length : path.indexOf('?'));
-    const params = new URLSearchParams(query);
-    params.set('seed', seed);
-    if (width !== 400 || height !== 400) {
-      params.set('w', String(width));
-      params.set('h', String(height));
-    }
-    // The page is always `/`, so the mode rides in the query here even though
-    // the image URL wears it as a path segment.
-    if (mode === 'postcard') {
-      params.set('mode', 'postcard');
-      params.set('side', side);
-    }
-    window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+    const query = buildStudioQuery({ seed, locks, preset, width, height, mode, side, text, card });
+    window.history.replaceState(null, '', `${window.location.pathname}?${query}`);
   }, [seed, locks, preset, width, height, mode, side, text, card]);
 
   return {

@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { CatSvg, PostcardSvg } from './CatSvg';
+import { ShareButton } from './ShareButton';
 import { NARROW, useMediaQuery } from './useMediaQuery';
 import { TRAIT_LABEL } from '../cat/spec';
 import { catName } from '../cat/traits';
+import { catShareTarget } from './share';
 import type { TraitKey } from '../cat/types';
 import type { CatMachine } from './useCatMachine';
 
@@ -17,8 +19,16 @@ export interface StageProps {
 
 /** The hero cat — or postcard — its name, and one lockable chip per trait. */
 export function Stage({ machine }: StageProps) {
-  const { traits, locks, mode, side, text, card, width, height } = machine;
+  const { traits, seed, locks, preset, mode, side, text, card, width, height } = machine;
   const onToggleLock = machine.toggleLock;
+
+  // Built when a share actually happens: a postcard share renders both sides
+  // at 1200px, which is not something to do on every keystroke in the card.
+  const share = useCallback(
+    () => catShareTarget({ seed, locks, preset, width, height, mode, side, text, card }),
+    [seed, locks, preset, width, height, mode, side, text, card],
+  );
+
   // Twenty-odd chips push everything else off a phone screen, so they fold
   // away there and stay open in the wide column.
   const narrow = useMediaQuery(NARROW);
@@ -50,6 +60,7 @@ export function Stage({ machine }: StageProps) {
         </div>
         <span className="edition">one of one</span>
       </div>
+      <ShareButton target={share} subject={mode === 'postcard' ? 'postcard' : 'cat'} />
       <details className="fold" open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>
         <summary>
           <h2>Traits{lockCount > 0 ? ` · ${lockCount} pinned` : ''}</h2>

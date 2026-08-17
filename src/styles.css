@@ -265,7 +265,8 @@ h1 {
   background: var(--paper-deep);
 }
 
-.stage svg {
+/* Scoped to the artboard: the share button carries its own small icon. */
+.stage .artboard svg {
   width: 100%;
   height: auto;
   display: block;
@@ -306,6 +307,89 @@ h1 {
   border-radius: 999px;
   padding: 5px 8px;
   opacity: 0.62;
+}
+
+/* ---------- share ----------
+ * The button opens the device's own share sheet where there is one; the menu
+ * is the desktop stand-in, so it floats over the card rather than pushing the
+ * trait chips down the page.
+ */
+.sharewrap {
+  position: relative;
+  margin-top: 12px;
+}
+
+.sharebar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 46px;
+  gap: 8px;
+}
+
+.share-go {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 0;
+}
+
+.share-more {
+  margin: 0;
+  padding: 9px 0;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+}
+
+.sharemenu {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  padding: 7px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 13px;
+  box-shadow: 5px 5px 0 var(--ink);
+}
+
+.sharemenu > a,
+.sharemenu > button {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 10px 11px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.sharemenu > a:hover,
+.sharemenu > button:hover {
+  background: var(--paper-deep);
+  transform: none;
+  box-shadow: none;
+}
+
+.sharemenu .hint {
+  margin: 6px 4px 2px;
+}
+
+.share-flash:not(:empty) {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  opacity: 0.7;
 }
 
 .chips {

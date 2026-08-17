@@ -227,15 +227,19 @@ export interface BuildUrlInput {
   locks?: Locks;
 }
 
-/** Inverse of {@link parseCatUrl} — the canonical path for a cat. */
-export function buildCatPath(input: BuildUrlInput): string {
-  const postcard = input.mode === 'postcard';
+/** The size a build input asks for, with the mode's own default filled in. */
+function buildSize(input: BuildUrlInput, postcard: boolean): [number, number] {
   const w = clampSize(input.width ?? (postcard ? POSTCARD_WIDTH : DEFAULT_SIZE));
   const h = clampSize(input.height ?? (postcard ? postcardHeightFor(w) : w));
-  const size = w === h ? `${w}` : `${w}x${h}`;
-  // `/cat/postcard/back/900x600/mackerel.svg` — the mode reads as part of the
-  // path, the way the size does.
-  const kind = postcard ? `postcard/${input.side === 'back' ? 'back/' : ''}` : '';
+  return [w, h];
+}
+
+/**
+ * Everything about a cat that travels in a query string — what it looks like
+ * and, on a postcard, what it says. Shared by the image URL and the studio
+ * link so the two can never describe different cats.
+ */
+function buildParams(input: BuildUrlInput, postcard: boolean): URLSearchParams {
   const q = new URLSearchParams();
   if (input.preset && input.preset !== 'anything') q.set('preset', input.preset);
   if (input.text) q.set('text', input.text);
@@ -253,6 +257,40 @@ export function buildCatPath(input: BuildUrlInput): string {
     const v = input.locks?.[k];
     if (v) q.set(k, v);
   }
-  const qs = q.toString();
+  return q;
+}
+
+/** Inverse of {@link parseCatUrl} — the canonical path for a cat. */
+export function buildCatPath(input: BuildUrlInput): string {
+  const postcard = input.mode === 'postcard';
+  const [w, h] = buildSize(input, postcard);
+  const size = w === h ? `${w}` : `${w}x${h}`;
+  // `/cat/postcard/back/900x600/mackerel.svg` — the mode reads as part of the
+  // path, the way the size does.
+  const kind = postcard ? `postcard/${input.side === 'back' ? 'back/' : ''}` : '';
+  const qs = buildParams(input, postcard).toString();
   return `/cat/${kind}${size}/${encodeURIComponent(input.seed)}.svg${qs ? `?${qs}` : ''}`;
+}
+
+/**
+ * The query half of a studio link — a page URL that reopens this exact cat or
+ * postcard. {@link parseCatUrl} reads it back, so the address bar, the share
+ * sheet and a pasted link all describe the same animal. The page is always
+ * `/`, so the mode rides in the query here even though the image URL wears it
+ * as a path segment.
+ */
+export function buildStudioQuery(input: BuildUrlInput): string {
+  const postcard = input.mode === 'postcard';
+  const [w, h] = buildSize(input, postcard);
+  const q = buildParams(input, postcard);
+  q.set('seed', input.seed);
+  if (w !== DEFAULT_SIZE || h !== DEFAULT_SIZE) {
+    q.set('w', String(w));
+    q.set('h', String(h));
+  }
+  if (postcard) {
+    q.set('mode', 'postcard');
+    q.set('side', input.side === 'back' ? 'back' : 'front');
+  }
+  return q.toString();
 }

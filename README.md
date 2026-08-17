@@ -250,6 +250,35 @@ The **Cat URL** panel gives you the image URL for whatever is on screen, an
 URL back in to preview and load it. The page URL always describes the current
 cat, so it is shareable as-is.
 
+### Sending one
+
+**Share**, under the cat, sends whatever is on the stage wherever the device can
+send things.
+
+On a phone or a tablet — and in desktop Safari and Chrome — that is the system
+share sheet, handed a 1200px PNG as a file. Messages, Mail, WhatsApp and the rest
+then put the picture itself in the draft rather than a link that may not render.
+A postcard goes as both of its sides, because a card someone wrote on is only
+half a card without its back.
+
+Where there is no share sheet, the `⋯` menu is the fallback, and it is always
+there on purpose:
+
+| Item | What it does |
+| --- | --- |
+| Email a draft | Opens a `mailto:` draft with the link, and copies the PNG so it can be pasted into the body |
+| Messages | Opens an `sms:` draft with the link |
+| Copy link | The studio URL for this exact cat or card |
+| Copy image | The PNG on the clipboard |
+| Download PNG / both sides | The same 1200px raster as files |
+
+A `mailto:` body is plain text, so nothing can embed an image in the draft
+itself — hence the clipboard copy alongside it, and hence the file share being
+the preferred path wherever the device offers one.
+
+`catShareTarget()` in `src/app/share.ts` builds one `ShareTarget` from a recipe
+and every target above is derived from it, postcard fields included.
+
 ---
 
 ## Running it
@@ -278,7 +307,7 @@ src/cat/        the generator — pure, dependency-free, runs in browser or edge
   traits.ts     makeTraits / catName / newSeed
   render.ts     renderCat, renderSheet, catArt, frame maths
   postcard.ts   renderPostcard — the same cat, mounted on a card
-  url.ts        parseCatUrl / buildCatPath / renderCatRequest
+  url.ts        parseCatUrl / buildCatPath / buildStudioQuery / renderCatRequest
   *.ts          the art: bodies, tails, heads, face, coats, accessories, scenes
 src/server/     handler.ts — URL ⇒ SVG response (status, body, headers)
 src/app/        the React studio
