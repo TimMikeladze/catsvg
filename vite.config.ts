@@ -67,6 +67,10 @@ function seo(): Plugin {
 
 export default defineConfig({
   plugins: [react(), catApi(), seo()],
+  // Pinned so the origin never drifts: devbar.config.ts claims these origins,
+  // and a page on an unexpected port would not be matched to this project.
+  server: { port: 5180, strictPort: true },
+  preview: { port: 4173, strictPort: true },
   test: {
     environment: 'jsdom',
     globals: true,

@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "devbar": {
+      "type": "stdio",
+      "command": "bunx",
+      "args": [
+        "devbar.sh",
+        "mcp"
+      ],
+      "env": {}
+    }
+  }
+}
