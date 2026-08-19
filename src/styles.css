@@ -126,6 +126,89 @@ h1 {
   flex: none;
 }
 
+.combos-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.combos:focus-visible {
+  outline: 3px solid var(--grape);
+  outline-offset: 3px;
+}
+
+/*
+ * Anchored to the pill's right edge because the pill sits at the right edge of
+ * the masthead — a centred bubble would hang off the viewport. `padding-top`
+ * rather than a gap keeps the tooltip's box touching the pill, so the pointer
+ * can travel into it without the wrapper losing hover.
+ */
+.combos-tip {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 5;
+  /*
+   * `right: 0` on an auto-width absolute box would shrink it to the pill's own
+   * width and snap the digits mid-group, so the bubble sizes to its content and
+   * only wraps once it would leave the page gutter.
+   */
+  width: max-content;
+  max-width: min(20rem, calc(100vw - 40px));
+  padding-top: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease,
+    visibility 0s linear 0.12s;
+}
+
+.combos-tip[data-open='true'] {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+}
+
+.combos-tip-body {
+  display: block;
+  max-width: 100%;
+  padding: 9px 11px;
+  color: var(--paper);
+  background: var(--ink);
+  border-radius: 10px;
+  box-shadow: 0 10px 24px rgba(33, 26, 51, 0.24);
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+  text-align: right;
+}
+
+.combos-tip-body strong {
+  display: block;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.combos-tip-note {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--body);
+  font-size: 10.5px;
+  letter-spacing: 0;
+  opacity: 0.66;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .combos-tip {
+    transform: none;
+    transition: none;
+  }
+}
+
 .combos {
   display: inline-flex;
   align-items: center;

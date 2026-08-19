@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from './App';
 import { FAQ } from '../seo/site';
+import { COMBOS } from '../cat/spec';
 
 const seedLine = () => screen.getByText(/^seed · /, { selector: '.seedline' }).textContent ?? '';
 
@@ -25,6 +26,28 @@ describe('App', () => {
     render(<App />);
     expect(screen.getByText(FAQ[0].q)).toBeInTheDocument();
     expect(screen.getAllByRole('definition')).toHaveLength(FAQ.length);
+  });
+
+  it('opens the combos tooltip on hover and focus, and closes it on Escape', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const pill = document.querySelector('.combos') as HTMLElement;
+    const tip = screen.getByRole('tooltip');
+
+    // The exact count is always readable to assistive tech, tooltip open or not.
+    expect(pill).toHaveAttribute('aria-describedby', tip.id);
+    expect(tip.textContent).toContain(COMBOS.toLocaleString('en-US'));
+    expect(tip).toHaveAttribute('data-open', 'false');
+
+    await user.hover(pill);
+    expect(tip).toHaveAttribute('data-open', 'true');
+    await user.unhover(pill);
+    expect(tip).toHaveAttribute('data-open', 'false');
+
+    act(() => pill.focus());
+    expect(tip).toHaveAttribute('data-open', 'true');
+    await user.keyboard('{Escape}');
+    expect(tip).toHaveAttribute('data-open', 'false');
   });
 
   it('rolls a new cat', async () => {

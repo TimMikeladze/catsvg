@@ -1,24 +1,65 @@
+import { useEffect, useId, useState } from 'react';
 import { COMBOS } from '../cat/spec';
+import { TRAIT_KEYS } from '../cat/types';
 import { GITHUB_URL, TAGLINE } from '../seo/site';
 
 /**
- * `COMBOS` is ~10²⁶, where `Intl` compact notation gives up and prints
- * "298,535,074,684.6T". Scientific notation is the only readable form.
+ * `COMBOS` is ~10²³, where `Intl` compact notation gives up and prints
+ * "167,925,979,510.1G". Scientific notation is the only readable form, so the
+ * digits it hides live in a tooltip instead.
+ *
+ * The tooltip is ours rather than a `title` attribute: `title` waits a second,
+ * never appears on keyboard focus, and cannot be styled. This one opens on
+ * hover and on focus, closes on Escape without moving the pointer, and stays
+ * mounted so `aria-describedby` reads the exact count whether or not it shows
+ * (WCAG 1.4.13).
  */
 function Combos() {
   const exponent = Math.floor(Math.log10(COMBOS));
   const mantissa = (COMBOS / 10 ** exponent).toFixed(2);
+  const tipId = useId();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
+
   return (
     <span
-      className="combos"
-      title={`${COMBOS.toLocaleString('en-US')} distinct cats`}
-      aria-label={`${mantissa} times 10 to the power of ${exponent} possible cats`}
+      className="combos-wrap"
+      onPointerEnter={() => setOpen(true)}
+      onPointerLeave={() => setOpen(false)}
+      // Focus moving anywhere outside the pill and its tooltip closes it.
+      onFocus={() => setOpen(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOpen(false);
+      }}
     >
-      <span className="combos-dot" aria-hidden="true" />
-      <span className="combos-number" aria-hidden="true">
-        {mantissa}<span className="combos-times">×</span>10<sup>{exponent}</sup>
+      <span
+        className="combos"
+        tabIndex={0}
+        aria-describedby={tipId}
+        aria-label={`${mantissa} times 10 to the power of ${exponent} possible cats`}
+      >
+        <span className="combos-dot" aria-hidden="true" />
+        <span className="combos-number" aria-hidden="true">
+          {mantissa}<span className="combos-times">×</span>10<sup>{exponent}</sup>
+        </span>
+        <span className="combos-label" aria-hidden="true">cats</span>
       </span>
-      <span className="combos-label" aria-hidden="true">cats</span>
+      <span className="combos-tip" id={tipId} role="tooltip" data-open={open}>
+        <span className="combos-tip-body">
+          <strong>{COMBOS.toLocaleString('en-US')}</strong>
+          <span className="combos-tip-note">
+            distinct cats — one per combination of {TRAIT_KEYS.length} traits
+          </span>
+        </span>
+      </span>
     </span>
   );
 }
