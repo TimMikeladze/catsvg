@@ -285,7 +285,7 @@ and every target above is derived from it, postcard fields included.
 
 ```bash
 bun install
-bun run dev            # app + image endpoint on http://localhost:5173
+bun run dev            # app + image endpoint on http://localhost:5180
 bun run test           # vitest
 bun run typecheck
 bun run build          # tsc + vite build
@@ -312,6 +312,7 @@ src/cat/        the generator — pure, dependency-free, runs in browser or edge
 src/server/     handler.ts — URL ⇒ SVG response (status, body, headers)
 src/app/        the React studio
 src/seo/        site copy, meta + JSON-LD, sitemap, the crawler-facing prerender
+  analytics.ts  the optional Umami tag, from env vars — absent when unset
 api/cat.ts      Vercel edge function wrapping the handler
 scripts/        brand images and the README artwork, drawn by the generator
 docs/readme/    the pictures on this page — regenerate, never hand-edit
@@ -336,6 +337,26 @@ vercel deploy
 `catsvg.vercel.app` deploy URL are 308 redirects onto it, configured as project
 domains on Vercel rather than in this repo.
 
+### Analytics — optional
+
+Two environment variables, read at build time by `vite.config.ts` and baked into
+the `<head>`. Set neither and the built page has no third-party script on it at
+all, which is what a fork or a local dev server gets.
+
+| Variable | What it does |
+| --- | --- |
+| `UMAMI_WEBSITE_ID` | The [Umami](https://umami.is) site id. Nothing is emitted without it. |
+| `UMAMI_SCRIPT_URL` | A self-hosted instance's `script.js`. Defaults to Umami Cloud. |
+
+```bash
+vercel env add UMAMI_WEBSITE_ID production
+vercel env add UMAMI_SCRIPT_URL production
+```
+
+The tag carries `data-domains="catsvg.app"`, derived from `SITE_URL`, so preview
+deployments and localhost load the script but report nothing — the numbers stay
+production-only. Copy `.env.example` to `.env.local` to try it locally.
+
 <details>
 <summary>Being found — how the SPA stays crawlable</summary>
 
@@ -349,6 +370,7 @@ the site says about itself:
 | `site.ts` | Title, description, intro, FAQ, snippets, example gallery |
 | `html.ts` | `<head>` tags, Open Graph / Twitter cards, JSON-LD, sitemap, robots.txt |
 | `shell.ts` | The static HTML injected into `#root` at build time |
+| `analytics.ts` | The optional Umami tag — see [Analytics](#analytics--optional) |
 
 The `seo` plugin in `vite.config.ts` injects the head and the prerender into
 `index.html`, and emits `sitemap.xml` and `robots.txt`. The same `site.ts`

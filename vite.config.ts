@@ -1,7 +1,8 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
-import type { Connect, Plugin } from 'vite';
+import { loadEnv, type Connect, type Plugin } from 'vite';
 import { handleCatRequest } from './src/server/handler';
+import { umamiTag, type AnalyticsEnv } from './src/seo/analytics';
 import { HOME, fullHead, robotsTxt, sitemapXml } from './src/seo/html';
 import { homeShell } from './src/seo/shell';
 
@@ -33,15 +34,18 @@ function catApi(): Plugin {
  * Everything a crawler needs: the `<head>`, the structured data and a
  * prerendered home page, plus the sitemap and robots.txt. React replaces the
  * prerender when it mounts, so both readings of the page say the same thing.
+ *
+ * The analytics tag rides along here: `env` decides whether there is one at all.
  */
-function seo(): Plugin {
+function seo(env: AnalyticsEnv): Plugin {
   return {
     name: 'seo',
     transformIndexHtml(html) {
       // Head-first, so <meta charset> lands well inside the first 1024 bytes a
       // parser reads rather than behind whatever Vite injected.
+      const head = [fullHead(HOME), umamiTag(env)].filter(Boolean).join('\n    ');
       return html
-        .replace('<head>', `<head>\n    ${fullHead(HOME)}`)
+        .replace('<head>', `<head>\n    ${head}`)
         .replace('<div id="root"></div>', `<div id="root">${homeShell()}\n    </div>`);
     },
     configureServer(server) {
@@ -65,8 +69,17 @@ function seo(): Plugin {
   };
 }
 
-export default defineConfig({
-  plugins: [react(), catApi(), seo()],
+/**
+ * Umami's two variables, from `.env*` locally and from the build environment on
+ * Vercel. Unprefixed on purpose: they are read here and baked into the HTML, so
+ * they never need to reach the client bundle as `import.meta.env`.
+ */
+function analyticsEnv(mode: string): AnalyticsEnv {
+  return { ...process.env, ...loadEnv(mode, process.cwd(), 'UMAMI_') };
+}
+
+export default defineConfig(({ mode }) => ({
+  plugins: [react(), catApi(), seo(analyticsEnv(mode))],
   // Pinned so the origin never drifts: devbar.config.ts claims these origins,
   // and a page on an unexpected port would not be matched to this project.
   server: { port: 5180, strictPort: true },
@@ -77,4 +90,4 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
   },
-});
+}));
